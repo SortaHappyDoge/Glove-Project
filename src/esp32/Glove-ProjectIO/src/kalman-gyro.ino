@@ -14,6 +14,10 @@ GyroData gyroData;          //Gyro data will be storeed here
 //MagData magData;            //Magnetometer data will be stored here, comment if no magnetometer
 
 
+float kalman_angle_roll = 0, kalman_uncertainty_angle_roll = 2 * 2;
+float kalman_angle_pitch = 0, kalman_uncertainty_angle_pitch = 2 * 2;
+float kalman_1D_output[] = {0, 0};
+float kalman_filtered_output[] = {0, 0};    // Stores the output given by the kalman filter (pitch and roll)
 
 void setup(){
     Wire.begin(); Wire.setClock(400000);    //Started I2C protocol, max speed 400khz
@@ -35,9 +39,23 @@ void setup(){
 void loop(){
     IMU.update();
     IMU.getAccel(&accelData); 
-    Serial.print(accelData.accelX); Serial.print("\t"); Serial.print(accelData.accelY); Serial.print("\t"); Serial.print(accelData.accelZ); Serial.print("\t");
+    // Serial.print(accelData.accelX); Serial.print("\t"); Serial.print(accelData.accelY); Serial.print("\t"); Serial.print(accelData.accelZ); Serial.print("\t");
     IMU.getGyro(&gyroData);
-    Serial.print(gyroData.gyroX); Serial.print("\t"); Serial.print(gyroData.gyroY); Serial.print("\t"); Serial.println(gyroData.gyroZ);
+    // Serial.print(gyroData.gyroX); Serial.print("\t"); Serial.print(gyroData.gyroY); Serial.print("\t"); Serial.println(gyroData.gyroZ);
+    
+    float angle_roll = atan(accelData.accelY/sqrt(accelData.accelX*accelData.accelX + accelData.accelZ*accelData.accelZ)) * 1/(3.1416/180);
+    float angle_pitch = -atan(accelData.accelX/sqrt(accelData.accelY*accelData.accelY + accelData.accelZ*accelData.accelZ)) * 1/(3.1416/180);
+    
+    calculate_kalman_1D(kalman_angle_roll, kalman_uncertainty_angle_roll, gyroData.gyroX, angle_roll);
+    kalman_angle_roll = kalman_1D_output[0]; kalman_uncertainty_angle_roll = kalman_1D_output[1];
+
+    calculate_kalman_1D(kalman_angle_pitch, kalman_uncertainty_angle_pitch, gyroData.gyroY, angle_pitch);
+    kalman_angle_pitch = kalman_1D_output[0]; kalman_uncertainty_angle_pitch = kalman_1D_output[1];
+
+    kalman_filtered_output[0] = kalman_angle_roll; kalman_filtered_output[1] = kalman_angle_pitch;
+    
+    Serial.print(kalman_filtered_output[0]); Serial.print("\t"); Serial.println(kalman_filtered_output[1]);
+
     delay(20);
 }
 
@@ -59,4 +77,15 @@ void calibrate_imu(){
     Serial.print(", ");
     Serial.println(calib.gyroBias[2]);
     delay(1000);
+}
+
+
+void calculate_kalman_1D(float kalman_state, float kalman_uncertainty, float kalman_input, float kalman_measurement){
+    kalman_state = kalman_state + (.004 * kalman_input);
+    kalman_uncertainty = kalman_uncertainty + (.004*.004 * 4*4);
+    float kalman_gain = kalman_uncertainty * 1/(1 * kalman_uncertainty + 3*3);
+    kalman_state = kalman_state + kalman_gain * (kalman_measurement - kalman_state);
+    kalman_uncertainty = (1 - kalman_gain) * kalman_uncertainty;
+    
+    kalman_1D_output[0] = kalman_state; kalman_1D_output[1] = kalman_uncertainty;
 }
