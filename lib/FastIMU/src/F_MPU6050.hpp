@@ -109,6 +109,7 @@ public:
 	String IMUManufacturer() override {
 		return "InvenSense";
 	}
+	bool dataAvailable(){ return (readByte(IMUAddress, MPU6050_INT_STATUS) & 0x01);}
 private:
 	float aRes = 16.0 / 32768.0;			//ares value for full range (16g) readings
 	float gRes = 2000.0 / 32768.0;			//gres value for full range (2000dps) readings
@@ -152,7 +153,5 @@ private:
 			dest[i++] = Wire.read();
 		}         // Put read results in the Rx buffer
 	}
-
-	bool dataAvailable(){ return (readByte(IMUAddress, MPU6050_INT_STATUS) & 0x01);}
 };
 #endif /* _F_MPU6050_H_ */
