@@ -15,12 +15,6 @@ GyroData gyroData;          //Gyro data will be storeed here
 //MagData magData;            //Magnetometer data will be stored here, comment if no magnetometer
 
 
-float kalman_angle_roll = 0, kalman_uncertainty_angle_roll = 2 * 2;
-float kalman_angle_pitch = 0, kalman_uncertainty_angle_pitch = 2 * 2;
-float kalman_1D_output[] = {0, 0};
-float kalman_filtered_output[] = {0, 0};    // Stores the output given by the kalman filter (pitch and roll)
-
-
 TaskHandle_t Core0Task;
 
 void setup(){
@@ -45,23 +39,29 @@ void setup(){
 
 void Core0loop(void * parameter){
     for(;;){
-        if(IMU.dataAvailable()){
-            calculate_kalman_output();
-        }
+            float gyro_rate_roll = gyroData.gyroX;
+            float gyro_rate_pitch = gyroData.gyroY;
+            float accel_angle_roll = accelData.accelX;
+            float accel_angle_pitch = accelData.accelY;
+
+            kalmanPredict(x_roll, P_roll, gyro_rate_roll);
+            kalmanUpdate(x_roll, P_roll, accel_angle_roll);
+
+            kalmanPredict(x_pitch, P_pitch, gyro_rate_pitch);
+            kalmanUpdate(x_pitch, P_pitch, accel_angle_pitch);
+
+            Serial.print("Roll: ");
+            Serial.print(x_roll);
+            Serial.print(" Pitch: ");
+            Serial.println(x_pitch);
+            delay(20);
     }
 }
 
 void loop(){
     IMU.update();
     IMU.getAccel(&accelData); 
-    // Serial.print(accelData.accelX); Serial.print("\t"); Serial.print(accelData.accelY); Serial.print("\t"); Serial.print(accelData.accelZ); Serial.print("\t");
     IMU.getGyro(&gyroData);
-    // Serial.print(gyroData.gyroX); Serial.print("\t"); Serial.print(gyroData.gyroY); Serial.print("\t"); Serial.println(gyroData.gyroZ);
-    
-    calculate_kalman_output(); 
-    
-    Serial.print(kalman_filtered_output[0]); Serial.print("\t"); Serial.println(kalman_filtered_output[1]);
-    
     delay(20);
 }
 
@@ -86,28 +86,60 @@ void calibrate_imu(){
 }
 
 
-void calculate_kalman_1D(float kalman_state, float kalman_uncertainty, float kalman_input, float kalman_measurement){
-    kalman_state = kalman_state + (.004 * kalman_input);
-    kalman_uncertainty = kalman_uncertainty + (.004*.004 * 4*4);
-    float kalman_gain = kalman_uncertainty * 1/(1 * kalman_uncertainty + 3*3);
-    kalman_state = kalman_state + kalman_gain * (kalman_measurement - kalman_state);
-    kalman_uncertainty = (1 - kalman_gain) * kalman_uncertainty;
-    
-    kalman_1D_output[0] = kalman_state; kalman_1D_output[1] = kalman_uncertainty;
+// Reserved for kalman
+
+const float dt = 0.01;
+const float Q_angle = 0.001;
+const float Q_gyro = 0.003;
+const float R_angle = 0.03;
+
+float x_roll = 0.0;
+float x_pitch = 0.0;
+float P_roll[2][2] = {{1, 0}, {0, 1}};
+float P_pitch[2][2] = {{1, 0}, {0, 1}};
+
+void kalmanPredict(float &x_angle, float P[2][2], float gyro_rate)
+{
+    float F[2][2] = {{1, -dt}, {dt, 1}};
+    float B[2] = {dt, 0};
+
+    float x_new = F[0][0] * x_angle + F[0][1] * B[0] * gyro_rate;
+    x_angle = x_new;
+
+    float P_temp[2][2];
+    P_temp[0][0] = F[0][0] * P[0][0] + F[0][1] * P[1][0];
+    P_temp[0][1] = F[0][0] * P[0][1] + F[0][1] * P[1][1];
+    P_temp[1][0] = F[1][0] * P[0][0] + F[1][1] * P[1][0];
+    P_temp[1][1] = F[1][0] * P[0][1] + F[1][1] * P[1][1];
+
+    P[0][0] = P_temp[0][0] + Q_angle;
+    P[0][1] = P_temp[0][1];
+    P[1][0] = P_temp[1][0];
+    P[1][1] = P_temp[1][1] + Q_gyro;
 }
 
-// Calculates the output with kalman filter applied, 
-// value is returned to kalman_filter_output
-void calculate_kalman_output(){
-    float angle_roll = atan(accelData.accelY/sqrt(accelData.accelX*accelData.accelX + accelData.accelZ*accelData.accelZ)) * 1/(3.1416/180);
-    float angle_pitch = -atan(accelData.accelX/sqrt(accelData.accelY*accelData.accelY + accelData.accelZ*accelData.accelZ)) * 1/(3.1416/180);
-    
-    calculate_kalman_1D(kalman_angle_roll, kalman_uncertainty_angle_roll, gyroData.gyroX, angle_roll);
-    kalman_angle_roll = kalman_1D_output[0]; kalman_uncertainty_angle_roll = kalman_1D_output[1];
+void kalmanUpdate(float &x_angle, float P[2][2], float accel_angle)
+{
+    float H[2] = {1, 0};
+    float y = accel_angle - (H[0] * x_angle);
+    float S = P[0][0] + R_angle;
 
-    calculate_kalman_1D(kalman_angle_pitch, kalman_uncertainty_angle_pitch, gyroData.gyroY, angle_pitch);
-    kalman_angle_pitch = kalman_1D_output[0]; kalman_uncertainty_angle_pitch = kalman_1D_output[1];
+    float K[2];
+    K[0] = P[0][0] / S;
+    K[1] = P[1][0] / S;
 
-    kalman_filtered_output[0] = kalman_angle_roll;
-    kalman_filtered_output[1] = kalman_angle_pitch;
+    x_angle += K[0] * y;
+
+    float P_temp[2][2];
+    P_temp[0][0] = P[0][0] - K[0] * P[0][0];
+    P_temp[0][1] = P[0][1] - K[0] * P[0][1];
+    P_temp[1][0] = P[1][0] - K[1] * P[0][0];
+    P_temp[1][1] = P[1][1] - K[1] * P[0][1];
+
+    P[0][0] = P_temp[0][0];
+    P[0][1] = P_temp[0][1];
+    P[1][0] = P_temp[1][0];
+    P[1][1] = P_temp[1][1];
 }
+
+//
