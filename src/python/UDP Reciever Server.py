@@ -28,9 +28,9 @@ def run_server(): # the server loop, end this to stop the server...
     while(True):
         try:
             request, address = server.recvfrom(1024)
-            var0, var1, var2, var3, var4, var5, var6 = unpack("2f", request)
+            var0, var1, var2 = unpack("2fi", request)
             
-            with open("C:/Users/Akif/Desktop/ESP Projects/Python Socket Server/Output.txt", "r+") as text_file:
+            with open("Output.txt", "r+") as text_file:
                 text_file.write(str(var0)  + " " + str(var1))
             print(str(var0)  + " " + str(var1))
         except Exception as e:
