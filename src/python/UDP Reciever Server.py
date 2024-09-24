@@ -1,9 +1,12 @@
 import socket
 from dataclasses import dataclass
-from struct import unpack
+from struct import unpack, pack
 
 server_ip = socket.gethostbyname(socket.getfqdn())
 port = 8000
+
+simulation_ip = "127.0.0.1"
+simulation_port = 8000
 
 @dataclass
 class State:
@@ -30,9 +33,18 @@ def run_server(): # the server loop, end this to stop the server...
             request, address = server.recvfrom(1024)
             var0, var1, var2 = unpack("2fi", request)
             
-            with open("Output.txt", "r+") as text_file:
-                text_file.write(str(var0)  + " " + str(var1))
+            #with open("Output.txt", "r+") as text_file:        BECAME REDUNDANT was used for testing
+            #    text_file.write(str(var0)  + " " + str(var1))
+
+            message = pack("2f", var0, var1)
+
+            try:
+                server.sendto(message, (simulation_ip, simulation_port))
+            except Exception as e:
+                #print(f"Error: {e}")
+                e = e
             print(str(var0)  + " " + str(var1))
+
         except Exception as e:
             print(f"Error: {e}")
 
