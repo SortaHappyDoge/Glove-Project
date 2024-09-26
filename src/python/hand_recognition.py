@@ -8,6 +8,9 @@ mp_drawing = mp.solutions.drawing_utils
 cap = cv2.VideoCapture(0)
 
 
+
+
+
 # Initialize Pose and Hands models
 with mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.4, min_tracking_confidence=0.7) as pose, \
      mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confidence=0.4, min_tracking_confidence=0.7) as hands:
@@ -21,6 +24,7 @@ with mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.4, min_tra
         #global pose_results
         pose_results = pose.process(frame)
         return pose_results
+
 
     # Draw pose landmarks on the frame if detection is successful
     def draw_pose(frame, pose_results):
@@ -42,10 +46,30 @@ with mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.4, min_tra
                     mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2, circle_radius=2),  # Hand landmark circles
                     mp_drawing.DrawingSpec(color=(255, 255, 0), thickness=2, circle_radius=2))  # Hand connection lines
                 
+
+    # Print pose and hand landmarks x,y,z coordinates with id
     def print_hand_landmarks(hand_results):
         if hand_results.multi_hand_landmarks:
-            for hand_landmarks in hand_results.multi_hand_world_landmarks:
-                print(hand_landmarks)
+            for hand_no, hand_landmarks in enumerate(hand_results.multi_hand_landmarks):
+                for id, landmark in enumerate(hand_landmarks.landmark):
+                    print(f"hand{hand_no}", id, landmark.x, landmark.y, landmark.z)
+    def print_pose_landmarks(pose_results):
+        if pose_results.pose_landmarks:
+            for id, landmark in enumerate(pose_results.pose_landmarks.landmark):
+                print("pose", id, landmark.x, landmark.y, landmark.z)
+
+
+    # Return pose and hand landmarks x,y,z coordinates with id
+    def get_hand_landmarks(hand_results):
+        if hand_results.multi_hand_landmarks:
+            for hand_no, hand_landmarks in enumerate(hand_results.multi_hand_landmarks):
+                for id, landmark in enumerate(hand_landmarks.landmark):
+                    return hand_no, id, landmark.x, landmark.y, landmark.z
+    def get_pose_landmarks(pose_results):
+        if pose_results.pose_landmarks:
+            for id, landmark in enumerate(pose_results.pose_landmarks.landmark):
+                return id, landmark.x, landmark.y, landmark.z
+    
 
     def main():
         while cap.isOpened():
@@ -53,23 +77,27 @@ with mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.4, min_tra
             if not success:
                 print("Ignoring empty camera frame.")
                 continue    
-            
+
             image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
-            pose_result = process_pose(image_bgr)
+            pose_result = process_pose(image_rgb)
             hand_result = process_hands(image_rgb)
             draw_pose(image_bgr, pose_result)
             draw_hands(image_bgr, hand_result)
-            print_hand_landmarks(hand_result)
-    
+            #print_pose_landmarks(pose_result)
+            #print_hand_landmarks(hand_result)
+            print(get_pose_landmarks(pose_result))  
+            print(get_hand_landmarks(hand_result))
+
             # Display the frame with pose and hand landmarks
             cv2.imshow('MediaPipe Detection Results', image_bgr)
     
-            # Break loop on 'q' key press
+            # Break loop on 'esc' key press
             if cv2.waitKey(5) & 0xFF == 27:
                 # Release the webcam and close the OpenCV window
                 cap.release()
                 cv2.destroyAllWindows()
+                break
 
 
-if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        main()
