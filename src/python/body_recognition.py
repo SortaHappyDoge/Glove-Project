@@ -20,16 +20,6 @@ pose = mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.4, min_t
 hands = mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confidence=0.4, min_tracking_confidence=0.7)
 
 
-# Perform hands detection
-def process_hands(frame):  # Takes a RGB image
-    hand_results = hands.process(frame)
-    return hand_results
-# Perform pose detection
-def process_pose(frame):  # Takes a RGB image
-    pose_results = pose.process(frame)
-    return pose_results
-
-
 # Draw pose landmarks on the frame if detection is successful
 def draw_pose(frame, pose_results):
     if pose_results.pose_landmarks:
@@ -65,14 +55,18 @@ def print_pose_landmarks(pose_results):
 
 # Return pose and hand landmarks x,y,z coordinates with id
 def get_hand_landmarks(hand_results):
+    landmarks = []
     if hand_results.multi_hand_landmarks:
-        for hand_no, hand_landmarks in enumerate(hand_results.multi_hand_landmarks):
+        for hand_no, hand_landmarks in enumerate(hand_results.multi_hand_world_landmarks):
             for id, landmark in enumerate(hand_landmarks.landmark):
-                return hand_no, id, landmark.x, landmark.y, landmark.z
+                landmarks.append((hand_no, id, landmark.x, landmark.y, landmark.z))
+    return landmarks
 def get_pose_landmarks(pose_results):
+    landmarks = []
     if pose_results.pose_landmarks:
-        for id, landmark in enumerate(pose_results.pose_landmarks.landmark):
-            return id, landmark.x, landmark.y, landmark.z
+        for id, landmark in enumerate(pose_results.pose_world_landmarks.landmark):
+            landmarks.append((id, landmark.x, landmark.y, landmark.z))
+    return landmarks
 
 
 def main():
@@ -85,8 +79,8 @@ def main():
             continue
 
         image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
-        pose_result = process_pose(image_rgb)
-        hand_result = process_hands(image_rgb)
+        pose_result = pose.process(image_rgb)
+        hand_result = hands.process(image_rgb)
         print(get_pose_landmarks(pose_result))
         draw_pose(image_bgr, pose_result)
         draw_hands(image_bgr, hand_result)
