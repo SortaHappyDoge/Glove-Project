@@ -7,6 +7,8 @@
 
 const char* ssid = "TurkTelekom_Z7FMA";
 const char* password = "3f17Gm9s61";
+const bool custom_network = false;
+
 
 const char* connection_ip = "192.168.1.37";
 int port = 8000;
@@ -78,8 +80,6 @@ void setup(){
     delay(20);
 
     connect_to_network();
-
-
 
     xTaskCreatePinnedToCore(Core0loop, "Core 0 Loop", 10000, NULL, 0, &Core0Task, 0);
 }
