@@ -39,19 +39,6 @@ struct SavedData
     calData calibData;
 }; SavedData savedData;
 
-//Reserved for kalman variables
-const float dt = 0.01;
-const float Q_angle = 0.001;
-const float Q_gyro = 0.003;
-const float R_angle = 0.03;
-
-float x_roll = 0.0;
-float x_pitch = 0.0;
-float P_roll[2][2] = {{1, 0}, {0, 1}};
-float P_pitch[2][2] = {{1, 0}, {0, 1}};
-//
-
-
 
 TaskHandle_t Core0Task;
 
@@ -84,27 +71,90 @@ void setup(){
     xTaskCreatePinnedToCore(Core0loop, "Core 0 Loop", 10000, NULL, 0, &Core0Task, 0);
 }
 
+
+// Constants
+double dt = 0.01;         // Time step (10 ms)
+double Q_theta = 1e-3;    // Process noise variance for angle
+double Q_omega = 1e-3;    // Process noise variance for angular velocity
+double R = 1e-3;          // Measurement noise variance (accelerometer noise)
+
+// Variables for Kalman Filter
+double theta = 0;         // Estimated angle
+double omega = 0;         // Estimated angular velocity
+double P_theta = 1;       // Uncertainty in angle
+double P_omega = 1;       // Uncertainty in angular velocity
+
+double theta1 = 0;         // Estimated angle
+double omega1 = 0;         // Estimated angular velocity
+double P_theta1 = 1;       // Uncertainty in angle
+double P_omega1 = 1;       // Uncertainty in angular velocity
+
+float *accelerometer_angle_measurement(float accelX, float accelY, float accelZ){
+    float *out_array = new float[2];
+    
+    out_array[0] = 180 * atan2(accelX, sqrt(accelY*accelY + accelZ*accelZ))/PI;
+    out_array[1] = 180 * atan2(accelY, sqrt(accelX*accelX + accelZ*accelZ))/PI;
+
+    return out_array;
+}
+
+void kalman_predict(double &theta, double &omega, double &P_theta, double &P_omega, double gyro_data, double dt){
+    //Convert from °/s to r/s
+    gyro_data = gyro_data * (PI / 180);
+
+    // Predict new angle using the gyro
+    theta = theta + omega * dt;
+    
+    // Angular velocity remains constant during prediction
+    omega = omega;
+    
+    // Update the error covariance (uncertainty in prediction)
+    P_theta = P_theta + Q_theta;
+    P_omega = P_omega + Q_omega;
+}
+
+void kalman_update(double &theta, double &omega, double &P_theta, double &P_omega, double accel_angle){
+    accel_angle = accel_angle * (PI / 180);
+    
+    // Measurement residual (difference between predicted angle and measured angle)
+    double y = accel_angle - theta;
+    
+    // Kalman Gain
+    double K = P_theta / (P_theta + R);
+    
+    // Update the angle estimate with the accelerometer data
+    theta = theta + K * y;
+    
+    // Update error covariance
+    P_theta = (1 - K) * P_theta;
+    
+    // Angular velocity is updated based on the gyroscope, so we don't update it here
+}
+
+
 void Core0loop(void * parameter){
     for(;;){
-            float gyro_rate_roll = gyroData.gyroX;
-            float gyro_rate_pitch = gyroData.gyroY;
-            float accel_angle_roll = accelData.accelX;
-            float accel_angle_pitch = accelData.accelY;
+            float *tmp =accelerometer_angle_measurement(accelData.accelX, accelData.accelY, accelData.accelZ);
+            
+            //Roll
+            kalman_predict(theta, omega, P_theta, P_omega, gyroData.gyroX, dt);
+            kalman_update(theta, omega, P_theta, P_omega, tmp[1]);
+            double theta_deg = theta * 180.0 / M_PI;
+            Serial.print(theta_deg);
+            output.roll = theta_deg;
+            Serial.print("\t");
 
-            kalmanPredict(x_roll, P_roll, gyro_rate_roll);
-            kalmanUpdate(x_roll, P_roll, accel_angle_roll);
+            //Pitch
+            kalman_predict(theta1, omega1, P_theta1, P_omega1, gyroData.gyroY, dt);
+            kalman_update(theta1, omega1, P_theta1, P_omega1, tmp[0]);
+            theta_deg = theta1 * 180.0 / M_PI;
+            Serial.println(theta_deg);
+            output.pitch = theta_deg;
 
-            kalmanPredict(x_pitch, P_pitch, gyro_rate_pitch);
-            kalmanUpdate(x_pitch, P_pitch, accel_angle_pitch);
 
-            Serial.print("Roll: ");
-            Serial.print(x_roll);
-            Serial.print(" Pitch: ");
-            Serial.println(x_pitch);
+            delete[] tmp;
 
-            output.pitch = x_pitch;
-            output.roll = x_roll;
-            delay(20);
+            delay(10);
     }
 }
 
@@ -156,54 +206,16 @@ void run_client(OutputData message)
     client.write((uint8_t *)&message, sizeof(message));
     client.endPacket();
 
-    Serial.println("Data transmitted...");
+    //Serial.println("Data transmitted...");
 }
 
 // Reserved for kalman
 
 
-void kalmanPredict(float &x_angle, float P[2][2], float gyro_rate)
-{
-    float F[2][2] = {{1, -dt}, {dt, 1}};
-    float B[2] = {dt, 0};
 
-    float x_new = F[0][0] * x_angle + F[0][1] * B[0] * gyro_rate;
-    x_angle = x_new;
 
-    float P_temp[2][2];
-    P_temp[0][0] = F[0][0] * P[0][0] + F[0][1] * P[1][0];
-    P_temp[0][1] = F[0][0] * P[0][1] + F[0][1] * P[1][1];
-    P_temp[1][0] = F[1][0] * P[0][0] + F[1][1] * P[1][0];
-    P_temp[1][1] = F[1][0] * P[0][1] + F[1][1] * P[1][1];
 
-    P[0][0] = P_temp[0][0] + Q_angle;
-    P[0][1] = P_temp[0][1];
-    P[1][0] = P_temp[1][0];
-    P[1][1] = P_temp[1][1] + Q_gyro;
-}
 
-void kalmanUpdate(float &x_angle, float P[2][2], float accel_angle)
-{
-    float H[2] = {1, 0};
-    float y = accel_angle - (H[0] * x_angle);
-    float S = P[0][0] + R_angle;
 
-    float K[2];
-    K[0] = P[0][0] / S;
-    K[1] = P[1][0] / S;
-
-    x_angle += K[0] * y;
-
-    float P_temp[2][2];
-    P_temp[0][0] = P[0][0] - K[0] * P[0][0];
-    P_temp[0][1] = P[0][1] - K[0] * P[0][1];
-    P_temp[1][0] = P[1][0] - K[1] * P[0][0];
-    P_temp[1][1] = P[1][1] - K[1] * P[0][1];
-
-    P[0][0] = P_temp[0][0];
-    P[0][1] = P_temp[0][1];
-    P[1][0] = P_temp[1][0];
-    P[1][1] = P_temp[1][1];
-}
 
 //

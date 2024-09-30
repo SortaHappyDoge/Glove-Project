@@ -52,6 +52,6 @@ public class SocketReciever : MonoBehaviour
 
 
     void FixedUpdate(){
-        transform.rotation = Quaternion.Euler(message.roll*-90, 0, message.pitch*90);
+        transform.rotation = Quaternion.Euler(message.roll*1, 0, message.pitch*1); 
     }
 }
