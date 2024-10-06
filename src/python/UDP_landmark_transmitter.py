@@ -3,13 +3,13 @@ import socket
 import body_recognition as br
 import cv2
 cap = cv2.VideoCapture(0)
-localIP = 1 
-server_address = ('localhost', 6789)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
+
+simulation_address = "localhost"
+simulation_port = 8001
+server_address = (simulation_address, simulation_port)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
 
     
 def main():
-    server_address = ('localhost', 6789)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
-
     # Create a UDP socket
     udp_server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
