@@ -10,7 +10,7 @@ const char* password = "3f17Gm9s61";
 const bool custom_network = false;
 
 
-const char* connection_ip = "192.168.1.37";
+const char* connection_ip = "192.168.1.48";
 int port = 8000;
 WiFiUDP client;
 uint8_t IMUid = 0;
