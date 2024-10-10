@@ -20,33 +20,28 @@ public class SocketReciever : MonoBehaviour
         
         Application.runInBackground = true;
 
-        new Thread(() =>
-        {
-        int recv;
-        byte[] data = new byte[1024];
-        IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 1234);
+        new Thread(() => {
+            IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 1234);
+            Socket newsock = new Socket(AddressFamily.InterNetwork,SocketType.Dgram, ProtocolType.Udp);
+            newsock.Bind(ipep);
+            Console.WriteLine("Waiting for a client...");
 
-        Socket newsock = new Socket(AddressFamily.InterNetwork,SocketType.Dgram, ProtocolType.Udp);
-
-        newsock.Bind(ipep);
-        Console.WriteLine("Waiting for a client...");
-
-        IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
-        EndPoint Remote = (EndPoint)(sender);
-
-        recv = newsock.ReceiveFrom(data, ref Remote);
-
-        while(true)
-        {
-            data = new byte[1024];
-            recv = newsock.ReceiveFrom(data, ref Remote);
-       
-            Console.WriteLine(Encoding.ASCII.GetString(data, 0, recv));
-
-            float[] split = Array.ConvertAll(Encoding.ASCII.GetString(data, 0, recv).Split(","), float.Parse);
-            message.pitch = split[0]; message.roll = split[1];
             
-        }
+
+            while(true)
+            {
+                IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
+                EndPoint Remote = (EndPoint)(sender);
+                byte[] data = new byte[1024];
+                int recv;
+                recv = newsock.ReceiveFrom(data, ref Remote);
+
+                Console.WriteLine(Encoding.ASCII.GetString(data, 0, recv));
+
+                float[] split = Array.ConvertAll(Encoding.ASCII.GetString(data, 0, recv).Split(","), float.Parse);
+                message.pitch = split[0]; message.roll = split[1];
+
+            }
         }).Start();
     }
 
