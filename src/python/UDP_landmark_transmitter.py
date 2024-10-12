@@ -5,7 +5,7 @@ import cv2
 cap = cv2.VideoCapture(0)
 
 simulation_address = "localhost"
-simulation_port = 8001
+simulation_port = 8000
 server_address = (simulation_address, simulation_port)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
 
     
@@ -32,9 +32,12 @@ def main():
         # Display the frame with pose and hand landmarks
         cv2.imshow('MediaPipe Detection Results', image_bgr)
         
+
+        buff = str(message).removeprefix("[").removesuffix("]").encode()
         # Send the message to the specified address
-        udp_server_socket.sendto(str(message).encode(), server_address)
-        print(f"Message sent:{message}")
+        udp_server_socket.sendto(buff, server_address) #[(hand_id, landmark_id, x, y, z), ...]
+        print(buff)
+        #print(f"Message sent:{message}")
                 
         # Break loop on 'esc' key press
         if cv2.waitKey(1) & 0xFF == 27:

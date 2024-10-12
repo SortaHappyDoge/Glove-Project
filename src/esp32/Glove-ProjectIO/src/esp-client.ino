@@ -6,8 +6,8 @@ const int onboard_button = 0; //GPIO0 BOOT button on esp32 that will be used for
 #include <WiFi.h>
 #include <WiFiUdp.h>
 
-const String default_ssid = "TurkTelekom_Z7FMA"; //Default WiFi SSID that will be used if input process is skipped
-const String default_password = "3f17Gm9s61";    //Default WiFi password that will be used if input process is skipped
+const char* default_ssid = "TurkTelekom_Z7FMA"; //Default WiFi SSID that will be used if input process is skipped
+const char* default_password = "3f17Gm9s61";    //Default WiFi password that will be used if input process is skipped
 
 const char* default_connection_ip = "192.168.1.48"; //Default "Data Reciever Server" IP that will be used if input process is skipped
 const u_int16_t server_port = 8000; //"Data Reciever Server" port
@@ -15,22 +15,22 @@ WiFiUDP UDP_client;     //Defined WiFiUDP class
 
 
 
-String ssid;
-String password;
-String connection_ip;
+char* ssid;
+char* password;
+char* connection_ip;
 
 
 /**
  * Can be skipped by pressing the BOOT button on the esp32,
  * Takes user input from the serial monitor of the following:
- * @param String *id - WiFi SSID with the "Data Reciever Server" running locally
- * @param String *pass - The password to the given network
- * @param String *ip - The local IP address that the "Data Reciever Server" is running on
+ * @param char* *id - WiFi SSID with the "Data Reciever Server" running locally
+ * @param char* *pass - The password to the given network
+ * @param char* *ip - The local IP address that the "Data Reciever Server" is running on
  * @warning Won't be useful if the esp32 is not connected to serial
 */
-void take_user_inputs(String *id, String *pass, String *ip){
-    ssid = default_ssid; password = default_password; connection_ip = default_connection_ip;
-    
+void take_user_inputs(char* *id, char* *pass, char* *ip){
+    strcpy(ssid, default_ssid); strcpy(password, default_password); strcpy(connection_ip, default_connection_ip);
+
     bool input_process = true;
     Serial.println("SSID, password, ip: ");
 
@@ -42,18 +42,17 @@ void take_user_inputs(String *id, String *pass, String *ip){
                 break;
             };
         if(Serial.available() != 0){
+            String buff = Serial.readString();
+            buff.trim();
             switch (i){
             case 3:
-                *id = Serial.readString();
-                id->trim();
+                buff.toCharArray(*id, sizeof(buff));
                 break;
             case 2:
-                *pass = Serial.readString();
-                pass->trim();
+                buff.toCharArray(*pass, sizeof(buff));
                 break;
             case 1:
-                *ip = Serial.readString();
-                ip->trim();
+                buff.toCharArray(*ip, sizeof(buff));
                 Serial.println("All inputs are saved");
                 input_process = false;
                 break;
@@ -65,11 +64,11 @@ void take_user_inputs(String *id, String *pass, String *ip){
 
 /**
  * Initiates connection to the local network (WiFi)
- * @param String id - WiFi SSID with the "Data Reciever Server" running locally
- * @param String pass - The password to the given network
+ * @param char* id - WiFi SSID with the "Data Reciever Server" running locally
+ * @param char* pass - The password to the given network
  * @warning No timeout coded in, if either the SSID or the password wrong it will loop to infinity
  */
-void initiate_connection(String id, String pass){
+void initiate_connection(char* id, char* pass){
     WiFi.begin(id, pass);
 
     while (WiFi.status() != WL_CONNECTED){
@@ -84,17 +83,14 @@ void initiate_connection(String id, String pass){
 
 /**
  * 
- * @param String ip - The ip of the server you want to send the "message" to
+ * @param char* ip - The ip of the server you want to send the "message" to
  * @param {unsigned char*} message - The "message" you want to send as a byte array
  */
-void send_data_to_server(String ip, char* message, uint8_t message_type){
+void send_data_to_server(char* ip, char* message, uint8_t message_type){
     if(WiFi.status() != WL_CONNECTED){initiate_connection(ssid, password);}
 
-    char* ip_char;
-    ip.toCharArray(ip_char, ip.length());
-
-    UDP_client.beginPacket(ip_char, server_port);
-    UDP_client.write(&message_type, sizeof(message_type));
+    UDP_client.beginPacket(ip, server_port);
+    UDP_client.write((uint8_t *)&message_type, sizeof(message_type));
     UDP_client.write((uint8_t *)&message, sizeof(message));
     UDP_client.endPacket();
 }

@@ -27,14 +27,19 @@ def initialize_server(): # initialize server
     run_server()
 
 def handle_connection():
-    buffer, address = server.recvfrom(1024)
+    buffer, address = server.recvfrom(6136)
     print(buffer[0])
-    match buffer[0]:   # will change this to use more 
-        case 1:     # data recieved from the esp32, default 3 floats (12 bytes)
+    match buffer[0]:   # will change this to use more
+        case 0:     # data recieved from hand recognition model=left hand, default NOT YET ASSIGNED
+            hands = unpack("5f", buffer)
+
+            print(pitch) # placeholder
+        case 1:     # data recieved from hand recognition model=right hand, default NOT YET ASSIGNED
             type, pitch, roll, id = unpack("B3f", buffer)
             print(pitch) # placeholder
-        case 2:     # data recieved from hand recognition model, default NOT YET ASSIGNED
-            print() # placeholder
+        case 2:     # data recieved from the esp32, default 3 floats (12 bytes)
+            type, pitch, roll, id = unpack("B3f", buffer)
+            print(pitch) # placeholder
     
 def run_server(): # the server loop, end this to stop the server...
     while(True):
