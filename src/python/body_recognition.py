@@ -53,19 +53,19 @@ def print_pose_landmarks(pose_results):
             print("pose", id, landmark.x, landmark.y, landmark.z)
 
 
-# Return pose and hand landmarks x,y,z coordinates with id
+# Return pose and hand landmarks x,y,z coordinates with id as float
 def get_hand_landmarks(hand_results):
     landmarks = []
     if hand_results.multi_hand_landmarks:
         for hand_no, hand_landmarks in enumerate(hand_results.multi_hand_world_landmarks):
             for id, landmark in enumerate(hand_landmarks.landmark):
-                landmarks.append((hand_no, id, landmark.x, landmark.y, landmark.z))
+                landmarks.append((float(hand_no), float(id), landmark.x, landmark.y, landmark.z))
     return landmarks
 def get_pose_landmarks(pose_results):
     landmarks = []
     if pose_results.pose_landmarks:
         for id, landmark in enumerate(pose_results.pose_world_landmarks.landmark):
-            landmarks.append((id, landmark.x, landmark.y, landmark.z))
+            landmarks.append((float(id), landmark.x, landmark.y, landmark.z))
     return landmarks
 
 

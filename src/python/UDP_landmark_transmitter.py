@@ -21,12 +21,12 @@ def main():
         # Turn BGR image to RGB image
         image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
 
-        pose_result = br.pose.process(image_rgb)
+        #pose_result = br.pose.process(image_rgb)
         hand_result = br.hands.process(image_rgb)
         # Sends any detected hand's landmarks with the format: [(hand_id, landmark_id, x, y, z), ...]
         message = (br.get_hand_landmarks(hand_result))
 
-        br.draw_pose(image_bgr, pose_result)
+        #br.draw_pose(image_bgr, pose_result)
         br.draw_hands(image_bgr, hand_result)
 
         # Display the frame with pose and hand landmarks
