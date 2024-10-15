@@ -321,6 +321,7 @@ GameObject:
   - component: {fileID: 1341093443}
   - component: {fileID: 1341093442}
   - component: {fileID: 1341093441}
+  - component: {fileID: 1341093446}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -427,6 +428,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1341093446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1341093440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ea2d894b85d3a044982839ae34f9a0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pythonPath: "\t\tC:\\Users\\MrSykenro\\AppData\\Local\\Programs\\Python\\Python312\\python.exe"
+  scriptPath: ..\..\..\..\python\UDP_landmark_transmitter.py
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
