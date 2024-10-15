@@ -4,10 +4,10 @@ import body_recognition as br
 import cv2
 cap = cv2.VideoCapture(0)
 
-simulation_address = "localhost"
+simulation_address = socket.gethostbyname(socket.getfqdn())
 simulation_port = 8000
 server_address = (simulation_address, simulation_port)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
-
+message_id = b'\x01' # the message identifier used for differentiating data sent to "UDP Reciever Server.py"
     
 def main():
     # Create a UDP socket
@@ -32,12 +32,14 @@ def main():
         # Display the frame with pose and hand landmarks
         cv2.imshow('MediaPipe Detection Results', image_bgr)
         
+        if len(message)>0:
+            message.insert(0, message_id[0]) # Changes the first byte of the list with the message_id as an identifier
+            buff = str(message).removeprefix("[").removesuffix("]").encode()            
+            udp_server_socket.sendto(buff, server_address)  # Send the message to the specified address
+            #print(buff)
+            #print(f"Message sent:{message}")
 
-        buff = str(message).removeprefix("[").removesuffix("]").encode()
-        # Send the message to the specified address
-        udp_server_socket.sendto(buff, server_address) #[(hand_id, landmark_id, x, y, z), ...]
-        print(buff)
-        #print(f"Message sent:{message}")
+
                 
         # Break loop on 'esc' key press
         if cv2.waitKey(1) & 0xFF == 27:

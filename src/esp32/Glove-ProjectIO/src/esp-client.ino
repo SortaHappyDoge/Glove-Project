@@ -111,6 +111,8 @@ void loop(){
 
     char buffer[sizeof(f)];
     memcpy(buffer, &f, sizeof(f));
-
+    
     send_data_to_server(connection_ip, buffer, 0x00);
+
+    free(buffer);
 }
