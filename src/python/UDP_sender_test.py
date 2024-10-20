@@ -1,7 +1,7 @@
 import socket
 from time import sleep
 # Define the server address and port
-server_ip = "127.0.0.1" #socket.gethostbyname(socket.getfqdn())
+server_ip = "localhost" #socket.gethostbyname(socket.getfqdn())
 server_port = 8000
 server_address = (server_ip, server_port)  # Replace with the target IP address and port number
 
