@@ -2,35 +2,131 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using Palmmedia.ReportGenerator.Core.Parser.Analysis;
+using Unity.VisualScripting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.UIElements;
+using System.Threading;
 
 public class ProjectLandmarks : MonoBehaviour
 {
-    string landmarkString = "[[(0.0, 0.0, 0.010135075077414513, 0.09027281403541565, 0.008654558099806309), (0.0, 1.0, 0.03863878175616264, 0.062205955386161804, -0.001657413667999208), (0.0, 2.0, 0.05565071478486061, 0.0330439954996109, -0.0027485855389386415), (0.0, 3.0, 0.06802470982074738, 0.0026873243041336536, -0.006464459467679262), (0.0, 4.0, 0.07047718018293381, -0.025700248777866364, -0.007038614712655544), (0.0, 5.0, 0.025738870725035667, -0.006750480271875858, 0.006415625102818012), (0.0, 6.0, 0.02544458396732807, -0.03403154015541077, -0.002657437464222312), (0.0, 7.0, 0.023595672100782394, -0.054467082023620605, -0.00942179560661316), (0.0, 8.0, 0.023395521566271782, -0.06851410865783691, -0.03872227668762207), (0.0, 9.0, 0.0005754538578912616, -0.005011700093746185, 0.005711372476071119), (0.0, 10.0, -0.002201118040829897, -0.04206370189785957, -0.005012007430195808), (0.0, 11.0, -0.004282315261662006, -0.06343729048967361, -0.025038855150341988), (0.0, 12.0, -0.003163388464599848, -0.08639322221279144, -0.04363689199090004), (0.0, 13.0, -0.017892954871058464, 0.002330756513401866, -0.003983862232416868), (0.0, 14.0, -0.02298084646463394, -0.029447738081216812, -0.01399579830467701), (0.0, 15.0, -0.02284764125943184, -0.04945117235183716, -0.03130265325307846), (0.0, 16.0, -0.02258872799575329, -0.06882903724908829, -0.048835281282663345), (0.0, 17.0, -0.03269602730870247, 0.01941521093249321, -0.010495721362531185), (0.0, 18.0, -0.03887132182717323, -0.003150383708998561, -0.015477302484214306), (0.0, 19.0, -0.03991761431097984, -0.02395692653954029, -0.025337036699056625), (0.0, 20.0, -0.039219554513692856, -0.03994060680270195, -0.04219609126448631)], [(1.0, 0.0, 0.03520134091377258, 0.08216753602027893, -0.009085169993340969), (1.0, 1.0, 0.0009593423455953598, 0.0708400160074234, -0.013940101489424706), (1.0, 2.0, -0.023414885625243187, 0.05494892969727516, -0.017007803544402122), (1.0, 3.0, -0.050005294382572174, 0.03512391820549965, -0.018741900101304054), (1.0, 4.0, -0.07359857112169266, 0.0174556877464056, -0.01633392833173275), (1.0, 5.0, -0.02554324083030224, 0.012185320258140564, 0.0052413297817111015), (1.0, 6.0, -0.038125526160001755, -0.013508095405995846, -0.002070726826786995), (1.0, 7.0, -0.05073118954896927, -0.02987401932477951, -0.014029241167008877), (1.0, 8.0, -0.06199372559785843, -0.03938372805714607, -0.03995161131024361), (1.0, 9.0, -0.005335221532732248, -0.0013516746694222093, 0.007105417549610138), (1.0, 10.0, -0.020029978826642036, -0.03618646413087845, -0.0029432373121380806), (1.0, 11.0, -0.03331252560019493, -0.0532945841550827, -0.021585799753665924), (1.0, 12.0, -0.04685831442475319, -0.07056782394647598, -0.04061097279191017), (1.0, 13.0, 0.016796180978417397, -0.009621171280741692, -0.003001970471814275), (1.0, 14.0, 0.005430235527455807, -0.03633223474025726, -0.01169153954833746), (1.0, 15.0, -0.005201110616326332, -0.0543006993830204, -0.0281999409198761), (1.0, 16.0, -0.017024612054228783, -0.06951633095741272, -0.04654240608215332), (1.0, 17.0, 0.03363315016031265, -0.0018590763211250305, -0.013741598464548588), (1.0, 18.0, 0.03152026608586311, -0.024457596242427826, -0.01663202792406082), (1.0, 19.0, 0.02495846152305603, -0.04232081398367882, -0.027555856853723526), (1.0, 20.0, 0.015732889994978905, -0.05405936390161514, -0.043253302574157715)]]";
-    /*Dictionary<string, string> charactersToReplace = new Dictionary<string, string>(){
-        {" ", string.Empty},
-        {"[", string.Empty},
-        {"[", string.Empty},
-        {"),(", "|"},
-    };*/
+    // Takes all values as floats converts handNo and landmarkId into integer
+    public struct landmark
+    {
+        public float handNo;
+        public float landmarkId;
+        public float landmarkX;
+        public float landmarkY;
+        public float landmarkZ;
+
+        public landmark(float handNo, float landmarkId, float landmarkX, float landmarkY, float landmarkZ){
+            this.handNo = handNo;
+            this.landmarkId = landmarkId;
+            this.landmarkX = landmarkX;
+            this.landmarkY = landmarkY;
+            this.landmarkZ = landmarkZ;
+        }
+
+        public override string ToString()
+        {
+            return $"Hand: {handNo}, LandmarkId: {landmarkId}, X: {landmarkX}, Y: {landmarkY}, Z: {landmarkZ}";
+        }
+    }
+
+
+    public ReceiveLandmarks receiveLandmarks;
+    public string landmarkString;
+    private List<landmark> landmarks = new();
+    private List<GameObject> objects = new();
+    public GameObject LandmarkPrefab;
+    
+
 
     // Start is called before the first frame update
     void Start()
     {
-        parseMessage(landmarkString);
+        landmarkString = receiveLandmarks.receivedMessage;
+        ParseMessage(landmarkString);
+        AssignVectors(1000);
     }
+
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(receiveLandmarks.hasReceivedMessage)
+        {
+            landmarkString = receiveLandmarks.receivedMessage;
+            ParseMessage(landmarkString);
+            AssignVectors(1000);
+            receiveLandmarks.hasReceivedMessage = false;
+        }
+
     }
 
-    void parseMessage(string message){
-        message = message.Replace(" ", string.Empty).Replace("[", string.Empty).Replace("]", string.Empty).Replace("),(", "|").Replace("(", string.Empty).Replace(")", string.Empty);
-        Debug.Log(message);
-        foreach(string landmark in message.Split("|")){
-            Debug.Log(landmark);
-        }}
+
+    // Parse the received landmark string into landmark structs
+    public void ParseMessage(string message)
+    {
+        landmarks.Clear();
+        // Clean the message
+        message = message.Replace(" ", string.Empty).Replace("],[", "|").Replace("[", string.Empty).Replace("]", string.Empty).Replace("),(", "|").Replace("(", string.Empty).Replace(")", string.Empty);
+        if(message.EndsWith("|")){message = message.Remove(message.Length - 1); }
+        if(message == string.Empty){/*Debug.Log("No data received");*/ return;}
+
+        foreach(string parsedString in message.Split("|"))
+        {
+            // Parse the message into float values
+            List<float> valueHolder = new();
+            foreach(string value in parsedString.Split(",")){
+                valueHolder.Add(float.Parse(value, CultureInfo.InvariantCulture.NumberFormat));
+            }
+            // Create and store landmarks in a list
+            landmarks.Add(new landmark(valueHolder[0], valueHolder[1], valueHolder[2], valueHolder[3], valueHolder[4]));
+        }
+    }
+
+    // Create and assign coordintes to objects
+    // Takes an integer to scale the size of the coordinates
+    public void AssignVectors(int coordinateScale){
+        foreach(GameObject i in objects){
+            Destroy(i);
+        }
+        objects.Clear();
+
+        int numberOfObjects = objects.Count;
+        int numberOfLandmarks = landmarks.Count;
+
+        // Create objects if they are less than the amount of landmark structs
+        if(numberOfObjects < numberOfLandmarks){
+            for(int i = numberOfObjects; i < numberOfLandmarks; i++){
+                GameObject newObject = Instantiate(LandmarkPrefab);
+                objects.Add(newObject);
+            }
+
+
+        }
+        // Remove extra objects if there are
+        if(numberOfObjects > numberOfLandmarks){
+            for(int i = numberOfObjects-1; i >= numberOfLandmarks; i--){
+                Destroy(objects[i]);
+                objects.RemoveAt(i);
+            }
+        }
+
+        // Assign coordinates to objects
+        for (int i = 0; i < numberOfLandmarks; i++)
+        {
+            float xOffset = (landmarks[i].handNo == 0) ? -0.1f*coordinateScale : 0.1f*coordinateScale;
+
+            objects[i].transform.position = new Vector3(
+                landmarks[i].landmarkX*coordinateScale + xOffset,
+                -landmarks[i].landmarkY*coordinateScale,
+                landmarks[i].landmarkZ*coordinateScale
+            );
+            
+        }
+    }
 }
