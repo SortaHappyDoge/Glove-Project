@@ -31,7 +31,7 @@ def main():
         # Landmarks of 2 hands ~3400 bytes
         message = str((br.get_hand_landmarks(hand_result)))
         udp_server_socket.sendto(message.encode(), server_address)
-        print(f"Message sent:{len(message)} bytes")
+        #print(f"Message sent:{len(message)} bytes")
         # Break loop on 'esc' key press
         if cv2.waitKey(1) & 0xFF == 27:
             # Release the webcam and close the OpenCV window
