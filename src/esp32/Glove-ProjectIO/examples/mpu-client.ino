@@ -23,8 +23,8 @@ float ypr[3];        // [yaw, pitch, roll]   Yaw/Pitch/Roll container and gravit
 #include <WiFi.h>
 #include <WiFiUdp.h>
 
-const char *default_ssid = "Redmii";       // Default WiFi SSID that will be used if input process is skipped
-const char *default_password = "cokgizli"; // Default WiFi password that will be used if input process is skipped
+const char *default_ssid = "TurkTelekom_Z7FMA";       // Default WiFi SSID that will be used if input process is skipped
+const char *default_password = "3f17Gm9s61"; // Default WiFi password that will be used if input process is skipped
 
 const char *default_connection_ip = "192.168.147.43"; // Default "Data Reciever Server" IP that will be used if input process is skipped
 const u_int16_t server_port = 8000;                   //"Data Reciever Server" port
@@ -100,8 +100,7 @@ void take_user_inputs(char **id, char **pass, char **ip)
  * @param char* pass - The password to the given network
  * @warning No timeout coded in, if either the SSID or the password wrong it will loop to infinity
  */
-void initiate_connection(char *id, char *pass)
-{
+void initiate_connection(char *id, char *pass){
     WiFi.begin(id, pass);
 
     while (WiFi.status() != WL_CONNECTED)
@@ -119,16 +118,14 @@ void initiate_connection(char *id, char *pass)
  * @param char* ip - The ip of the server you want to send the "message" to
  * @param {unsigned char*} message - The "message" you want to send as a byte array
  */
-void send_data_to_server(char *ip, byte *message, uint8_t message_type)
-{
-    if (WiFi.status() != WL_CONNECTED)
-    {
+void send_data_to_server(char *ip, byte** message, uint8_t message_type){
+    if (WiFi.status() != WL_CONNECTED){
         initiate_connection(ssid, password);
     }
 
     UDP_client.beginPacket(ip, server_port);
     //UDP_client.write(&message_type, sizeof(message_type));
-    UDP_client.write(message, sizeof(message));
+    UDP_client.write((uint8_t)&message, sizeof(message));
     UDP_client.endPacket();
 }
 
@@ -156,8 +153,7 @@ void mpu_dmp_recieve(void *){
     }
 }
 
-void setup()
-{
+void setup(){
     pinMode(onboard_button, INPUT);
 
     Wire.begin();
@@ -221,8 +217,7 @@ void setup()
     }
 }
 
-void loop()
-{
+void loop(){
     mpu_dmp_recieve(&message_data);
     byte buffer[sizeof(message_data)];
     memcpy(buffer, message_data, sizeof(message_data));

@@ -8,8 +8,8 @@ const int onboard_button = 0; // GPIO0 BOOT button on esp32 that will be used fo
 const char *default_ssid = "TurkTelekom_Z7FMA"; // Default WiFi SSID that will be used if input process is skipped
 const char *default_password = "3f17Gm9s61";    // Default WiFi password that will be used if input process is skipped
 
-const char *default_connection_ip = "192.168.1.40"; // Default "Data Reciever Server" IP that will be used if input process is skipped
-const u_int16_t server_port = 8000;                 //"Data Reciever Server" port
+const char *default_connection_ip = "192.168.1.37"; // Default "Data Reciever Server" IP that will be used if input process is skipped
+const u_int16_t server_port = 8000;                //"Data Reciever Server" port
 WiFiUDP UDP_client;                                 // Defined WiFiUDP class
 
 char *ssid;
@@ -100,7 +100,7 @@ void initiate_connection(char *id, char *pass)
  * @param char* ip - The ip of the server you want to send the "message" to
  * @param {unsigned char*} message - The "message" you want to send as a byte array
  */
-void send_data_to_server(char *ip, char *message, uint8_t message_type)
+void send_data_to_server(char *ip, byte *message, uint8_t message_type)
 {
     if (WiFi.status() != WL_CONNECTED)
     {
@@ -108,8 +108,8 @@ void send_data_to_server(char *ip, char *message, uint8_t message_type)
     }
 
     UDP_client.beginPacket(ip, server_port);
-    //UDP_client.write((uint8_t *)&message_type, sizeof(message_type)); 
-    UDP_client.write((uint8_t *)message, sizeof(message));
+    //UDP_client.write((uint8_t *)message_type, sizeof(message_type)); 
+    UDP_client.write(message, sizeof(message));
     UDP_client.endPacket();
 }
 
@@ -135,11 +135,16 @@ void setup()
 
 void loop()
 {
-    float f[4] = {0.03, 0.12, 5.134, 326.32};
+    int f[4] = {146, 2, 5, 326};
     
-    char buffer[sizeof(f)+1];
+    byte buffer[sizeof(f)];
     memcpy(buffer, f, sizeof(f));
-    buffer[sizeof(f)] = '\0';
-    //Serial.println(sizeof(((uint8_t* )buffer)));
-    send_data_to_server(connection_ip, buffer, 0x00);
+    //buffer[sizeof(f)] = '\0';
+    //Serial.print(buffer[0]); Serial.print(buffer[1]); Serial.print(buffer[2]); Serial.print(buffer[3]); Serial.print(buffer[4]); Serial.print(buffer[5]); Serial.print(buffer[6]); Serial.println(buffer[7]);
+    //send_data_to_server(connection_ip, buffer, 0x00);
+
+    UDP_client.beginPacket(connection_ip, server_port);
+    UDP_client.print(0x00);
+    UDP_client.write(buffer, sizeof(buffer));
+    UDP_client.endPacket();
 }
