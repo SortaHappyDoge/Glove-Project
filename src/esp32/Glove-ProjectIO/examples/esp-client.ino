@@ -100,16 +100,15 @@ void initiate_connection(char *id, char *pass)
  * @param char* ip - The ip of the server you want to send the "message" to
  * @param {unsigned char*} message - The "message" you want to send as a byte array
  */
-void send_data_to_server(char *ip, byte *message, uint8_t message_type)
+void send_data_to_server(char *ip, byte message[], int length, uint8_t message_type)
 {
-    if (WiFi.status() != WL_CONNECTED)
-    {
+    if (WiFi.status() != WL_CONNECTED){
         initiate_connection(ssid, password);
     }
 
     UDP_client.beginPacket(ip, server_port);
-    //UDP_client.write((uint8_t *)message_type, sizeof(message_type)); 
-    UDP_client.write(message, sizeof(message));
+    UDP_client.print(message_type); 
+    UDP_client.write(message, length);
     UDP_client.endPacket();
 }
 
@@ -139,12 +138,5 @@ void loop()
     
     byte buffer[sizeof(f)];
     memcpy(buffer, f, sizeof(f));
-    //buffer[sizeof(f)] = '\0';
-    //Serial.print(buffer[0]); Serial.print(buffer[1]); Serial.print(buffer[2]); Serial.print(buffer[3]); Serial.print(buffer[4]); Serial.print(buffer[5]); Serial.print(buffer[6]); Serial.println(buffer[7]);
-    //send_data_to_server(connection_ip, buffer, 0x00);
-
-    UDP_client.beginPacket(connection_ip, server_port);
-    UDP_client.print(0x00);
-    UDP_client.write(buffer, sizeof(buffer));
-    UDP_client.endPacket();
+    send_data_to_server(connection_ip, buffer, sizeof(buffer), 0x00);
 }

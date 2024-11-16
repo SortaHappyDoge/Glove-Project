@@ -26,7 +26,7 @@ float ypr[3];        // [yaw, pitch, roll]   Yaw/Pitch/Roll container and gravit
 const char *default_ssid = "TurkTelekom_Z7FMA";       // Default WiFi SSID that will be used if input process is skipped
 const char *default_password = "3f17Gm9s61"; // Default WiFi password that will be used if input process is skipped
 
-const char *default_connection_ip = "192.168.147.43"; // Default "Data Reciever Server" IP that will be used if input process is skipped
+const char *default_connection_ip = "192.168.1.37"; // Default "Data Reciever Server" IP that will be used if input process is skipped
 const u_int16_t server_port = 8000;                   //"Data Reciever Server" port
 WiFiUDP UDP_client;                                   // Defined WiFiUDP class
 float message_data[10];                               // Contains the array of floats that are sent {accelX, accelY, accelZ, roll, pitch, yaw, {Quaternion}}
@@ -118,14 +118,14 @@ void initiate_connection(char *id, char *pass){
  * @param char* ip - The ip of the server you want to send the "message" to
  * @param {unsigned char*} message - The "message" you want to send as a byte array
  */
-void send_data_to_server(char *ip, byte** message, uint8_t message_type){
+void send_data_to_server(char *ip, byte message[], int length, uint8_t message_type){
     if (WiFi.status() != WL_CONNECTED){
         initiate_connection(ssid, password);
     }
 
     UDP_client.beginPacket(ip, server_port);
-    //UDP_client.write(&message_type, sizeof(message_type));
-    UDP_client.write((uint8_t)&message, sizeof(message));
+    UDP_client.print(message_type);
+    UDP_client.write(message, length);
     UDP_client.endPacket();
 }
 
@@ -219,10 +219,10 @@ void setup(){
 
 void loop(){
     mpu_dmp_recieve(&message_data);
+    
     byte buffer[sizeof(message_data)];
     memcpy(buffer, message_data, sizeof(message_data));
-    Serial.println(message_data[4]);
-    send_data_to_server(connection_ip, buffer, 0x00);
+    send_data_to_server(connection_ip, buffer, sizeof(buffer), 0x00);
 
     delay(10);
 }
