@@ -208,7 +208,7 @@ Transform:
   m_GameObject: {fileID: 330645695}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -200}
+  m_LocalPosition: {x: 0, y: 1, z: -400}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -354,8 +354,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58e7cde2e2c9b014885a6f041d3d0ebc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDrawLines: 0
   receiveLandmarks: {fileID: 1341093447}
-  landmarkString: 
   LandmarkPrefab: {fileID: 4516597874745992418, guid: dac57223de9a6a449b9baa3eee3860fe, type: 3}
 --- !u!114 &1341093447
 MonoBehaviour:
