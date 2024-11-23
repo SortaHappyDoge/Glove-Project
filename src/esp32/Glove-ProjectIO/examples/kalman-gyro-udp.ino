@@ -14,13 +14,14 @@ const char* connection_ip = "192.168.1.48";
 int port = 8000;
 WiFiUDP client;
 uint8_t IMUid = 0;
-size_t message_size = 1024;
+size_t message_size = 12;
 
 struct OutputData
 {
+    uint8_t pass = 1;
     float roll;
     float pitch;
-    uint8_t id;
+    float id;
 }; OutputData output;
 //#define EEPROM_SIZE 1024
 

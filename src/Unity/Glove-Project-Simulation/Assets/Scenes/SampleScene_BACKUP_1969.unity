@@ -122,9 +122,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
-
+<<<<<<< HEAD
+--- !u!1 &481377297
+=======
 --- !u!1 &655736087
-
+>>>>>>> feature-better-esp-data-transfer
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -132,9 +134,15 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
+<<<<<<< HEAD
+  - component: {fileID: 481377300}
+  - component: {fileID: 481377299}
+  - component: {fileID: 481377298}
+=======
   - component: {fileID: 655736090}
   - component: {fileID: 655736089}
   - component: {fileID: 655736088}
+>>>>>>> feature-better-esp-data-transfer
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -216,6 +224,9 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+<<<<<<< HEAD
+--- !u!1 &1048701193
+=======
 --- !u!1 &1803140177
 GameObject:
   m_ObjectHideFlags: 0
@@ -274,7 +285,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1973065325
-
+>>>>>>> feature-better-esp-data-transfer
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -451,7 +462,12 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-
+<<<<<<< HEAD
+  - {fileID: 481377300}
+  - {fileID: 1266695927}
+  - {fileID: 1048701197}
+=======
   - {fileID: 655736090}
   - {fileID: 1973065327}
   - {fileID: 1803140178}
+>>>>>>> feature-better-esp-data-transfer

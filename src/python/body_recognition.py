@@ -62,6 +62,7 @@ def get_hand_landmarks(hand_results):
                 if hand_no == 1 or hand_no == 0:
                     landmarks[hand_no].append((float(hand_no), float(id), landmark.x, landmark.y, landmark.z))
     return landmarks
+    
 def get_pose_landmarks(pose_results):
     landmarks = []
     if pose_results.pose_landmarks:

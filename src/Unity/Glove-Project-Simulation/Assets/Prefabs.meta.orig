@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
+guid: a72261cacbdfd0d44961da9f75fb4d9b
+=======
 guid: 0fb4c220c9cb2bd49ab78fd32082092e
+>>>>>>> feature-better-esp-data-transfer
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

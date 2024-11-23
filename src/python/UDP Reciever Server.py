@@ -6,12 +6,7 @@ server_ip = socket.gethostbyname(socket.getfqdn())
 port = 8000
 
 simulation_ip = socket.gethostbyname(socket.getfqdn())
-simulation_port = 1234
-
-@dataclass
-class State:
-    pitch: float
-    roll: float
+simulation_port = 8001
 
 def main():
     initialize_server() 
@@ -26,17 +21,41 @@ def initialize_server(): # initialize server
     print(f"Listening on {server_ip}:{port}")
     run_server()
 
+def handle_connection():
+    buffer, address = server.recvfrom(1024)
+    message = buffer
+
+    #message_id = int(message[0])
+    print(len(buffer))
+    print(buffer)
+    #print(buffer[1])
+    #print(buffer[2])
+    #print(buffer[3])
+    #print(unpack("i2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f2i3f", message))
+    #print(unpack('f', buffer))
+
+    #match message_id:
+    #    case 0:     # not yet assigned
+    #        #hands = unpack("5f", buffer)
+    #        #print(buffer[1])
+    #        print() # placeholder
+    #    case 1:     # data recieved from hand recognition model, default NOT YET ASSIGNED
+    #        #hands = unpack("5f", buffer)
+    #        print(len(buffer))
+    #        print("???") # placeholder
+    #    case 2:     # data recieved from the esp32, default 3 floats (12 bytes)
+    #        type, pitch, roll, id = unpack("B3f", buffer)
+    #        #print(pitch) # placeholder
     
 def run_server(): # the server loop, end this to stop the server...
     while(True):
-        try:
-            request, address = server.recvfrom(1024)
-            var0, var1, var2 = unpack("2fi", request)
-            
-            
-            #message = pack("2f", var0, var1)
-            message = str(var0) + " , " + str(var1)
+        handle_connection()
 
+        """
+        try:
+            request, address = server.recvfrom()
+            
+            
             try:
                 server.sendto(message.encode("utf-8"), (simulation_ip, simulation_port))
             except Exception as e:
@@ -46,6 +65,8 @@ def run_server(): # the server loop, end this to stop the server...
 
         except Exception as e:
             print(f"Error: {e}")
+        """
+        
 
    
     

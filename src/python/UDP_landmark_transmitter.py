@@ -2,13 +2,16 @@
 import socket
 import body_recognition as br
 import cv2
+from struct import pack
 cap = cv2.VideoCapture(0)
 
-address_to_send = "localhost"
-port_to_send = 8000
-server_address = (address_to_send, port_to_send)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
 
-    
+simulation_address = socket.gethostbyname(socket.getfqdn())
+simulation_port = 8000
+server_address = (simulation_address, simulation_port)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
+message_id = 1 # the message identifier used for differentiating data sent to "UDP Reciever Server.py"
+
+
 def main():
     # Create a UDP socket
     udp_server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -30,8 +33,33 @@ def main():
         # Landmarks of 1 hand ~1700 bytes
         # Landmarks of 2 hands ~3400 bytes
         message = str((br.get_hand_landmarks(hand_result)))
-        udp_server_socket.sendto(message.encode(), server_address)
-        #print(f"Message sent:{len(message)} bytes")
+
+        
+        if len(message)>0:
+            #message.insert(0, bytes(message_id[0])) # Changes the first byte of the list with the message_id as an identifier
+            buff = bytearray([])
+            buff.extend((message_id).to_bytes())
+
+            if len(message) == 1:
+                landmarks = message[0]
+                
+                for i in landmarks:
+                    buff.extend(pack("2i3f", *i))
+            elif len(message) == 2:
+                landmarks = message[0] + message[1]
+
+                for i in landmarks:
+                    buff.extend(pack("2i3f", *i))
+            else:
+                print("message size error")
+                return
+            
+            print(len(buff))
+            udp_server_socket.sendto(buff, server_address)  # Send the message to the specified address
+            #print(buff)
+            #print(f"Message sent:{message}")
+
+
         # Break loop on 'esc' key press
         if cv2.waitKey(1) & 0xFF == 27:
             # Release the webcam and close the OpenCV window

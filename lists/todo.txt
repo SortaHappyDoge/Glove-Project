@@ -1,0 +1,29 @@
+ESP32:
+-esp32 connection to wifi                                           //DONE: No room for improvement
+-esp32 connection to socket servers (UDP Reciever Server.py)        //DONE: May look into better packet transfering solutions.
+-esp32 imu sensor read                                              //TODO: No *realistic* room for improvement, SHOULD add magnetometers to the project
+-esp32 partially-functional kalman filter for the imu               //TODO: "Make it better, faster, harder, stronger"
+-esp32 improving the package sending methods                        //TODO: Sort of "DONE", need to polish it further.
+-esp32 multiple-sensor(imu)-read in parallel                        //soonTM: DONT FORGET TO WRITE HERE****
+-esp32 must look into using other sensors                           //soonTM: Should start looking into it after polishing the simulation
+(a.k.a. muscle-voltage-reading electrodes)  
+
+UNITY(Simulation):
+-Unity created new project                                          //DONE: yes, this is a real milestone ;-;
+-Unity created data collection script                               //TODO: Improve the script to accept different types of inputs, might change this script to be the only data reciever script, basically deprecating "UDP Reciever Server.py"
+(on a different port than the "UDP Reciever Server.py")
+-Unity displayed output of the kalman filter for a single           //DONE: very wacky but it aight
+instance of a sensor
+
+
+DATA RECIEVER(Python):
+-Python data reciever server                                        //DONE:
+-Python improved data
+
+IMAGE RECOGNITION:  //the uzbek will handle this (hehe)
+
+GIT:
+-git create todo file                                               //WARNING: DO NOT FORGET TO PUSH THE TODO TO MAIN (my dumbass will forget)
+
+
+the missile is very eepy zzzzzzzzzzzz
