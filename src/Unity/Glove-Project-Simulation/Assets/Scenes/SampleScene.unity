@@ -122,7 +122,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &330645695
+--- !u!1 &481377297
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -130,9 +130,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 330645698}
-  - component: {fileID: 330645697}
-  - component: {fileID: 330645696}
+  - component: {fileID: 481377300}
+  - component: {fileID: 481377299}
+  - component: {fileID: 481377298}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -140,21 +140,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &330645696
+--- !u!81 &481377298
 AudioListener:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 330645695}
+  m_GameObject: {fileID: 481377297}
   m_Enabled: 1
---- !u!20 &330645697
+--- !u!20 &481377299
 Camera:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 330645695}
+  m_GameObject: {fileID: 481377297}
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
@@ -199,22 +199,22 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!4 &330645698
+--- !u!4 &481377300
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 330645695}
+  m_GameObject: {fileID: 481377297}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -400}
+  m_LocalPosition: {x: 0, y: 1, z: -350}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &755539926
+--- !u!1 &1048701193
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -222,8 +222,87 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 755539928}
-  - component: {fileID: 755539927}
+  - component: {fileID: 1048701197}
+  - component: {fileID: 1048701196}
+  - component: {fileID: 1048701195}
+  - component: {fileID: 1048701194}
+  m_Layer: 0
+  m_Name: Start Scripts
+  m_TagString: Untagged
+  m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1048701194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048701193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58e7cde2e2c9b014885a6f041d3d0ebc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDrawLines: 1
+  receiveLandmarks: {fileID: 1048701195}
+  LandmarkPrefab: {fileID: 4516597874745992418, guid: dac57223de9a6a449b9baa3eee3860fe, type: 3}
+--- !u!114 &1048701195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048701193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c98d25948956ae419bc2d9eddd6d8c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  receiveLandmarks: 1
+  hasReceivedMessage: 0
+  receivedMessage: 
+  listenPort: 8000
+--- !u!114 &1048701196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048701193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8675d76a78a705f42bf752b8d187aa46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  runScript: 0
+  pythonParameter: C:\Users\MrSykenro\Desktop\Projects\glove-project\src\python\UDP_landmark_transmitter.py
+--- !u!4 &1048701197
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048701193}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1266695925
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1266695927}
+  - component: {fileID: 1266695926}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -231,13 +310,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!108 &755539927
+--- !u!108 &1266695926
 Light:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 755539926}
+  m_GameObject: {fileID: 1266695925}
   m_Enabled: 1
   serializedVersion: 10
   m_Type: 1
@@ -293,13 +372,13 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
---- !u!4 &755539928
+--- !u!4 &1266695927
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 755539926}
+  m_GameObject: {fileID: 1266695925}
   serializedVersion: 2
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
   m_LocalPosition: {x: 0, y: 3, z: 0}
@@ -308,89 +387,10 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!1 &1341093440
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1341093445}
-  - component: {fileID: 1341093448}
-  - component: {fileID: 1341093447}
-  - component: {fileID: 1341093446}
-  m_Layer: 0
-  m_Name: Start Scripts
-  m_TagString: Untagged
-  m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1341093445
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1341093440}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1341093446
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1341093440}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58e7cde2e2c9b014885a6f041d3d0ebc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isDrawLines: 0
-  receiveLandmarks: {fileID: 1341093447}
-  LandmarkPrefab: {fileID: 4516597874745992418, guid: dac57223de9a6a449b9baa3eee3860fe, type: 3}
---- !u!114 &1341093447
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1341093440}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c98d25948956ae419bc2d9eddd6d8c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  receiveLandmarks: 1
-  hasReceivedMessage: 0
-  receivedMessage: 
-  listenPort: 8000
---- !u!114 &1341093448
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1341093440}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8675d76a78a705f42bf752b8d187aa46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  runScript: 0
-  pythonParameter: C:\Users\MrSykenro\Desktop\Projects\glove-project\src\python\UDP_landmark_transmitter.py
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 330645698}
-  - {fileID: 755539928}
-  - {fileID: 1341093445}
+  - {fileID: 481377300}
+  - {fileID: 1266695927}
+  - {fileID: 1048701197}
