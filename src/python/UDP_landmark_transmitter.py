@@ -2,13 +2,14 @@
 import socket
 import body_recognition as br
 import cv2
+from struct import pack
 cap = cv2.VideoCapture(0)
 
 simulation_address = socket.gethostbyname(socket.getfqdn())
 simulation_port = 8000
 server_address = (simulation_address, simulation_port)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
-message_id = b'\x01' # the message identifier used for differentiating data sent to "UDP Reciever Server.py"
-    
+message_id = 1 # the message identifier used for differentiating data sent to "UDP Reciever Server.py"
+
 def main():
     # Create a UDP socket
     udp_server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -33,8 +34,25 @@ def main():
         cv2.imshow('MediaPipe Detection Results', image_bgr)
         
         if len(message)>0:
-            message.insert(0, message_id[0]) # Changes the first byte of the list with the message_id as an identifier
-            buff = str(message).removeprefix("[").removesuffix("]").encode()            
+            #message.insert(0, bytes(message_id[0])) # Changes the first byte of the list with the message_id as an identifier
+            buff = bytearray([])
+            buff.extend((message_id).to_bytes())
+
+            if len(message) == 1:
+                landmarks = message[0]
+                
+                for i in landmarks:
+                    buff.extend(pack("2i3f", *i))
+            elif len(message) == 2:
+                landmarks = message[0] + message[1]
+
+                for i in landmarks:
+                    buff.extend(pack("2i3f", *i))
+            else:
+                print("message size error")
+                return
+            
+            print(len(buff))
             udp_server_socket.sendto(buff, server_address)  # Send the message to the specified address
             #print(buff)
             #print(f"Message sent:{message}")

@@ -63,10 +63,12 @@ def get_hand_landmarks(hand_results):
             for id, landmark in enumerate(hand_landmarks.landmark):
                 if hand_no == 0:
                     left_landmarks.append((hand_no, id, landmark.x, landmark.y, landmark.z))
-                else:
+                elif hand_no == 1:
                     right_landmarks.append((hand_no, id, landmark.x, landmark.y, landmark.z))
-        landmarks.append(left_landmarks)
-        landmarks.append(right_landmarks)
+        if left_landmarks != []:
+            landmarks.append(left_landmarks)
+        if right_landmarks != []:
+            landmarks.append(right_landmarks)
                 
     return landmarks
 def get_pose_landmarks(pose_results):
