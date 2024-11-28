@@ -2,7 +2,7 @@ import socket
 from time import sleep
 
 # Define the IP address and port to listen on
-local_ip = "localhost" #socket.gethostbyname(socket.getfqdn())  # Listen on all available interfaces
+local_ip = "0.0.0.0" #socket.gethostbyname(socket.getfqdn())  # Listen on all available interfaces
 local_port = 8000
 
 # Create a UDP socket
