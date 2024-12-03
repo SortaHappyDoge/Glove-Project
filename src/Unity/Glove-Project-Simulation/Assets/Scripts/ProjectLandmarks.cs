@@ -46,14 +46,21 @@ public class ProjectLandmarks : MonoBehaviour
     public GameObject LandmarkPrefab;
     private string landmarkString;
     private List<Landmark> landmarks = new();
-    private List<GameObject> objects = new();
     private Dictionary<(int, int), LineRenderer> lines = new Dictionary<(int, int), LineRenderer>();
 
     // Define specific pairs of indexes to connect with lines
     private List<(int, int)> indexPairs = new()
     {
-        (0, 1), (1, 2), (2, 3), (3, 4), (1, 5), (5, 6), (6, 7), (7, 8), (5, 9), (9, 10), (10, 11), (11, 12), (9, 13), (13, 14), (14, 15), (15, 16), (0, 17), (13, 17), (17, 18), (18, 19), (19, 20),
-        (21, 22), (22, 23), (23, 24), (24, 25), (22, 26), (26, 27), (27, 28), (28, 29), (26, 30), (30, 31), (31, 32), (32, 33), (30, 34), (34, 35), (35, 36), (36, 37), (21, 38), (34, 38), (38, 39), (39, 40), (40, 41)
+        // Landmarks from left hand
+        (0, 1), (1, 2), (2, 3), (3, 4), (1, 5), (5, 6), 
+        (6, 7), (7, 8), (5, 9), (9, 10), (10, 11), 
+        (11, 12), (9, 13), (13, 14), (14, 15), (15, 16), 
+        (0, 17), (13, 17), (17, 18), (18, 19), (19, 20),
+        // Landmarks from right hand
+        (21, 22), (22, 23), (23, 24), (24, 25), (22, 26), 
+        (26, 27), (27, 28), (28, 29), (26, 30), (30, 31), 
+        (31, 32), (32, 33), (30, 34), (34, 35), (35, 36), 
+        (36, 37), (21, 38), (34, 38), (38, 39), (39, 40), (40, 41)
     };
 
     // Start is called before the first frame update
@@ -85,7 +92,10 @@ public class ProjectLandmarks : MonoBehaviour
     {
         // Clean the message
         message = message.Replace(" ", string.Empty).Replace("],[", "|").Replace("[", string.Empty).Replace("]", string.Empty).Replace("),(", "|").Replace("(", string.Empty).Replace(")", string.Empty);
-        if (message.EndsWith("|")) { message = message.Remove(message.Length - 1); }
+        // Removes any extra characters left from .Replace("],[", "|") 
+        if (message.EndsWith("|")) { message = message.Substring(0, message.Length - 1); }
+        if (message.StartsWith("|")) { message = message.Substring(1); }
+
         if (receiveLandmarks.hasReceivedMessage && string.IsNullOrEmpty(message)) 
         { 
             /*Debug.Log("No data received");*/ 
@@ -107,7 +117,7 @@ public class ProjectLandmarks : MonoBehaviour
         {
 
             string[] parsedLandmark = stringLandmarks[i].Split(",");
-            // Create new landmarks if doesnt exist
+            // Create new landmarks if there arent enough doesnt exist
             if (i >= landmarks.Count)
             {
                 landmarks.Add(new Landmark(
@@ -157,6 +167,7 @@ public class ProjectLandmarks : MonoBehaviour
         }
     }
 
+    // Draws lines between landmarks to distinguish them
     void UpdateLines()
     {
         foreach (var pair in indexPairs)

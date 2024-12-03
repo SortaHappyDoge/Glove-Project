@@ -26,7 +26,7 @@ def main():
         hand_result = br.hands.process(image_rgb)
         pose_result = br.pose.process(image_rgb)
         # Draw and Display the frame with pose and hand landmarks
-        #br.draw_hands(image_bgr, hand_result)
+        br.draw_hands(image_bgr, hand_result)
         br.draw_pose(image_bgr, pose_result)
         cv2.imshow('MediaPipe Detection Results', image_bgr)
 
@@ -34,12 +34,14 @@ def main():
         # Recommended buffer size is 3584 bytes (3584 = 2^11 * 2^10 * 2^9)
         # Landmarks of 1 hand ~1700 bytes
         # Landmarks of 2 hands ~3400 bytes
-        message = str((br.get_hand_landmarks(hand_result)))
-
+        message = str(br.get_hand_landmarks(hand_result))
+        udp_server_socket.sendto(message.encode(), server_address)  # Send the message to the specified address
+ 
+        """
         if len(message)>0:
             #message.insert(0, bytes(message_id[0])) # Changes the first byte of the list with the message_id as an identifier
             
-            """
+            
             buff = bytearray([])
             buff.extend((message_id).to_bytes())
             
@@ -56,13 +58,11 @@ def main():
             else:
                 print("message size error")
                 return
-            """
             
-            udp_server_socket.sendto(message.encode(), server_address)  # Send the message to the specified address
-
             #print(len(buff))
             #print(buff)
-            #print(f"Message sent:{message}")
+        """
+        print(hand_result.multi_handedness)
 
         # Break loop on 'esc' key press
         if cv2.waitKey(1) & 0xFF == 27:
