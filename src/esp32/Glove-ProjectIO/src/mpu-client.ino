@@ -23,10 +23,10 @@ float ypr[3];        // [yaw, pitch, roll]   Yaw/Pitch/Roll container and gravit
 #include <WiFi.h>
 #include <WiFiUdp.h>
 
-const char *default_ssid = "TurkTelekom_Z7FMA";       // Default WiFi SSID that will be used if input process is skipped
-const char *default_password = "3f17Gm9s61"; // Default WiFi password that will be used if input process is skipped
+const char *default_ssid = "Redmii";       // Default WiFi SSID that will be used if input process is skipped
+const char *default_password = "cokgizli"; // Default WiFi password that will be used if input process is skipped
 
-const char *default_connection_ip = "192.168.1.37"; // Default "Data Reciever Server" IP that will be used if input process is skipped
+const char *default_connection_ip = "192.168.147.43"; // Default "Data Reciever Server" IP that will be used if input process is skipped
 const u_int16_t server_port = 8000;                   //"Data Reciever Server" port
 WiFiUDP UDP_client;                                   // Defined WiFiUDP class
 float message_data[10];                               // Contains the array of floats that are sent {accelX, accelY, accelZ, roll, pitch, yaw, {Quaternion}}
@@ -223,6 +223,6 @@ void loop(){
     byte buffer[sizeof(message_data)];
     memcpy(buffer, message_data, sizeof(message_data));
     send_data_to_server(connection_ip, buffer, sizeof(buffer), 0x00);
-
+    Serial.println(message_data[3]);
     delay(10);
 }
