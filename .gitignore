@@ -7,3 +7,5 @@
 src/esp32/Glove-ProjectIO/.vscode/c_cpp_properties.json
 src/esp32/Glove-ProjectIO/.vscode/extensions.json
 src/esp32/Glove-ProjectIO/.vscode/launch.json
+
+src/python/env

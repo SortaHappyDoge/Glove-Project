@@ -68,7 +68,7 @@ def get_pose_landmarks(pose_results):
     landmarks = []
     if pose_results.pose_landmarks:
         for id, landmark in enumerate(pose_results.pose_world_landmarks.landmark):
-            landmarks.append((float(id), landmark.x, landmark.y, landmark.z))
+            landmarks.append((2.0, float(id), landmark.x, landmark.y, landmark.z))
     return landmarks
 
 

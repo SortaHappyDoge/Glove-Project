@@ -9,10 +9,12 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Threading;
 using System.Security.Cryptography.X509Certificates;
+//using System.Numerics;
+
 
 public class ProjectLandmarks : MonoBehaviour
 {
-    // Takes all values as floats converts handNo and landmarkId into integer
+    // Takes all values as floats
     public struct Landmark
     {
         public float handNo;
@@ -45,7 +47,8 @@ public class ProjectLandmarks : MonoBehaviour
     public ReceiveLandmarks receiveLandmarks;
     public GameObject LandmarkPrefab;
     private string landmarkString;
-    private List<Landmark> landmarks = new();
+    private List<Landmark> handLandmarks = new();
+    private List<Landmark> handPositions = new();
     private Dictionary<(int, int), LineRenderer> lines = new Dictionary<(int, int), LineRenderer>();
 
     // Define specific pairs of indexes to connect with lines
@@ -91,28 +94,50 @@ public class ProjectLandmarks : MonoBehaviour
     public void ParseMessage(string message)
     {
         // Clean the message
-        message = message.Replace(" ", string.Empty).Replace("],[", "|").Replace("[", string.Empty).Replace("]", string.Empty).Replace("),(", "|").Replace("(", string.Empty).Replace(")", string.Empty);
+        message = message.Replace(" ", string.Empty).Replace("],[", "|").Replace("[", string.Empty).Replace("]", string.Empty)
+        .Replace("),(", "|").Replace("(", string.Empty).Replace(")", string.Empty).Replace("||", "|");
         // Removes any extra characters left from .Replace("],[", "|") 
         if (message.EndsWith("|")) { message = message.Substring(0, message.Length - 1); }
         if (message.StartsWith("|")) { message = message.Substring(1); }
 
+        // Delete everything when no data is received
         if (receiveLandmarks.hasReceivedMessage && string.IsNullOrEmpty(message)) 
         { 
             /*Debug.Log("No data received");*/ 
-            foreach (var landmark in landmarks)
+            foreach (var landmark in handLandmarks)
             {
             if (landmark.landmarkObject != null)
             {
                 Destroy(landmark.landmarkObject);
             }
             }
-            landmarks.Clear();
+            handLandmarks.Clear();
             return; 
         }
 
-        // Parse the message into structs
-        string[] stringLandmarks = message.Split("|");
+        string[] parsedMessage = message.Split("|");
+        string[] handString = parsedMessage[..^2];
+        string[] positionString = parsedMessage[^2..];
+        Debug.Log(handString.Length);
 
+        ParseToLandmark(handString, handLandmarks);
+        ParseToLandmark(positionString, handPositions);
+
+        // Remove extra objects
+        if (handString.Length < handLandmarks.Count)
+        {
+            for (int i = handString.Length; i < handLandmarks.Count; i++)
+            {
+                Destroy(handLandmarks[i].landmarkObject);
+            }
+            handLandmarks.RemoveRange(handString.Length, handLandmarks.Count - handString.Length);
+        }
+    }
+
+    // Assingns values in given string array to the specified landmark list  
+    public void ParseToLandmark(string[] stringLandmarks, List<Landmark> landmarks)
+    {
+        // Parse the message into structs
         for (int i = 0; i < stringLandmarks.Length; i++)
         {
 
@@ -129,7 +154,7 @@ public class ProjectLandmarks : MonoBehaviour
                     Instantiate(LandmarkPrefab)));
             }
 
-            // Change the xyz of the landmark
+            // Change the xyz of the landmark by replacing the struct with a new one
             else
             {
                 Landmark landmark = landmarks[i]; 
@@ -138,15 +163,6 @@ public class ProjectLandmarks : MonoBehaviour
                 landmark.landmarkZ = float.Parse(parsedLandmark[4], CultureInfo.InvariantCulture.NumberFormat);
                 landmarks[i] = landmark;
             }
-        } 
-        // Remove extra objects
-        if (stringLandmarks.Length < landmarks.Count)
-        {
-            for (int i = stringLandmarks.Length; i < landmarks.Count; i++)
-            {
-                Destroy(landmarks[i].landmarkObject);
-            }
-            landmarks.RemoveRange(stringLandmarks.Length, landmarks.Count - stringLandmarks.Length);
         }
     }
 
@@ -154,16 +170,34 @@ public class ProjectLandmarks : MonoBehaviour
     // Takes an integer to scale the size of the coordinates
     public void AssignVectors(int coordinateScale)
     {
-        // Assign coordinates to objects
-        for (int i = 0; i < landmarks.Count; i++)
-        {
-            float xOffset = (landmarks[i].handNo == 0) ? 0.1f * coordinateScale : -0.1f * coordinateScale;
+        Vector3 leftHand = new Vector3(
+            handPositions[0].landmarkX * coordinateScale,
+            -handPositions[0].landmarkY * coordinateScale,
+            handPositions[0].landmarkZ * coordinateScale);
+        Vector3 rightHand = new Vector3(
+            handPositions[1].landmarkX * coordinateScale,
+            -handPositions[1].landmarkY * coordinateScale,
+            handPositions[1].landmarkZ * coordinateScale);
 
-            landmarks[i].landmarkObject.transform.position = new Vector3(
-                landmarks[i].landmarkX * coordinateScale + xOffset,
-                -landmarks[i].landmarkY * coordinateScale,
-                landmarks[i].landmarkZ * coordinateScale
-            );
+        // Assign coordinates to objects
+        for (int i = 0; i < handLandmarks.Count; i++)
+        {
+            if (handLandmarks[i].handNo == 0)
+            {
+                handLandmarks[i].landmarkObject.transform.position = new Vector3(
+                    handLandmarks[i].landmarkX * coordinateScale,
+                    -handLandmarks[i].landmarkY * coordinateScale,
+                    handLandmarks[i].landmarkZ * coordinateScale)
+                    + leftHand;
+            }
+            if (handLandmarks[i].handNo == 1)
+            {
+                handLandmarks[i].landmarkObject.transform.position = new Vector3(
+                    handLandmarks[i].landmarkX * coordinateScale,
+                    -handLandmarks[i].landmarkY * coordinateScale,
+                    handLandmarks[i].landmarkZ * coordinateScale)
+                    + rightHand;
+            }
         }
     }
 
@@ -176,10 +210,10 @@ public class ProjectLandmarks : MonoBehaviour
             int indexB = pair.Item2;
 
             // Ensure both indexes are within the bounds of the objects list
-            if (indexA < landmarks.Count && indexB < landmarks.Count)
+            if (indexA < handLandmarks.Count && indexB < handLandmarks.Count)
             {
-                GameObject objA = landmarks[indexA].landmarkObject;
-                GameObject objB = landmarks[indexB].landmarkObject;
+                GameObject objA = handLandmarks[indexA].landmarkObject;
+                GameObject objB = handLandmarks[indexB].landmarkObject;
 
                 if (objA != null && objB != null)
                 {
@@ -209,8 +243,8 @@ public class ProjectLandmarks : MonoBehaviour
             int indexB = pair.Key.Item2;
 
             // Check if objects are null or indexes are out of bound
-            if (indexA >= landmarks.Count || indexB >= landmarks.Count ||
-                landmarks[indexA].landmarkObject == null || landmarks[indexB].landmarkObject == null)
+            if (indexA >= handLandmarks.Count || indexB >= handLandmarks.Count ||
+                handLandmarks[indexA].landmarkObject == null || handLandmarks[indexB].landmarkObject == null)
             {
                 Destroy(pair.Value.gameObject);  // Destroy LineRenderer
                 keysToRemove.Add(pair.Key);
