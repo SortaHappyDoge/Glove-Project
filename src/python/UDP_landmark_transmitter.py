@@ -2,6 +2,7 @@
 import socket
 import body_recognition as br
 import cv2
+import time
 from struct import pack
 cap = cv2.VideoCapture(0)
 
@@ -40,18 +41,19 @@ def main():
         message = br.get_hand_landmarks(hand_result)
 
         # Add pose data to display location of hands instead of just the position of hands
-        if br.get_pose_landmarks(pose_result): message.append([br.get_pose_landmarks(pose_result)[15], br.get_pose_landmarks(pose_result)[16]])
-        else:                                  message.append([(2.0, 15.0, -0.5, 0.0, 0.0),(2.0, 16.0, 0.5, 0.0, 0.0)])
+        if br.get_pose_landmarks(pose_result): 
+            message.append(br.get_pose_landmarks(pose_result)[15])
+            message.append(br.get_pose_landmarks(pose_result)[16])
+        else:                                  
+            message.append((2.0, 15.0, -0.5, 0.0, 0.0))
+            message.append((2.0, 16.0, 0.5, 0.0, 0.0))
         
         message_to_send = []
 
-        print(message)
-
         # Convert the message into a single dimentional list to send over UDP by packing
-        for items in message:
-            for values in items:
-                for data in values:
-                    message_to_send.append(data)
+        for landmark in message:
+            for value in landmark:
+                message_to_send.append(value)
 
         
         buffer = pack(f'{len(message_to_send)}f', *message_to_send) 
