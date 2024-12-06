@@ -9,6 +9,8 @@ public class SocketRecieverNEW : MonoBehaviour
     Socket server;
     Thread SocketThread;
 
+
+
     public GameObject demoCube;
     public Vector3 demoRotation; 
     float PI = 3.14f;
@@ -37,7 +39,7 @@ public class SocketRecieverNEW : MonoBehaviour
 
         while(true){
             //data = null;
-            var bytes = new byte[1024];
+            var bytes = new byte[10240];
             int bytesReceived = server.Receive(bytes);
             //data += Encoding.ASCII.GetString(bytes, 0, bytesReceived);
 
@@ -45,13 +47,49 @@ public class SocketRecieverNEW : MonoBehaviour
             
             Array.Copy(bytes, 1, dataByte, 0, bytesReceived-1);
 
-            var data = new float[dataByte.Length / sizeof(float)];
-            Buffer.BlockCopy(dataByte, 0, data, 0, dataByte.Length);
-            
+            if(bytes[0] == 1){
+                var data = new float[dataByte.Length / sizeof(float)];
+                Buffer.BlockCopy(dataByte, 0, data, 0, dataByte.Length);  
 
-            /* Demo to see the output values */
-            demoRotation = new Vector3(data[3], 0, data[4])/PI*180;
-            /*                               */
+                /* Demo to see the output values */
+                demoRotation = new Vector3(data[3], 0, data[4])/PI*180;
+                /*                               */  
+            }
+            if(bytes[0] == 2){
+                /*switch (dataByte.Length)
+                {
+                    case 176: //44 floats
+
+                    case 92:
+                    default:
+                        break;
+                }*/
+                var data = new float[dataByte.Length/sizeof(float)];
+                Buffer.BlockCopy(dataByte, 0, data, 0, dataByte.Length);
+
+                /*  Attempt at turning float into landmarks :pray:
+                List<> landmarks = new();
+                float[] landmark = new();
+                int j = 5;
+                
+                foreach(float value in data){
+                    landmark.Add(value);
+                    --j;
+                    if(j == 0){
+                        landmarks.Add(landmark);
+                        j == 5;
+                        landmark = new();
+                    }
+                }
+                */
+
+
+                /*foreach(float value in data){
+                    Debug.Log(value);
+                }*/
+            }
+
+            Debug.Log(bytes[0]);
 
             /*foreach(var b in bytes){
                 Debug.Log(b);
@@ -67,19 +105,9 @@ public class SocketRecieverNEW : MonoBehaviour
     }
     
     void Update(){
-        /*if(demoRotation.x < 0){
-            demoRotation.x = 90 - demoRotation.x;
-        }
-        if(demoRotation.y < 0){
-            demoRotation.y = 90 - demoRotation.y;
-        }
-        if(demoRotation.z < 0){
-            demoRotation.z = 90 - demoRotation.z;
-        }*/
-        
         demoCube.transform.eulerAngles = demoRotation; 
     }
-
+    
 
     void OnDisable(){
         server.Close();

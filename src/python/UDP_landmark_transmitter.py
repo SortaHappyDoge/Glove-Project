@@ -2,11 +2,12 @@
 import socket
 import body_recognition as br
 import cv2
+import pickle
 from struct import pack
 cap = cv2.VideoCapture(0)
 
 
-simulation_address = "localhost" #socket.gethostbyname(socket.getfqdn())
+simulation_address = socket.gethostbyname(socket.getfqdn()) #socket.gethostbyname(socket.getfqdn())
 simulation_port = 8000
 server_address = (simulation_address, simulation_port)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
 message_id = 1 # the message identifier used for differentiating data sent to "UDP Reciever Server.py"
@@ -42,7 +43,10 @@ def main():
         # Add pose data to display location of hands instead of just the position of hands
         if br.get_pose_landmarks(pose_result): message.append([br.get_pose_landmarks(pose_result)[15], br.get_pose_landmarks(pose_result)[16]])
         else:                                  message.append([(2.0, 15.0, -0.5, 0.0, 0.0),(2.0, 16.0, 0.5, 0.0, 0.0)])
-        udp_server_socket.sendto(str(message).encode(), server_address)  # Send the message to the specified address
+        
+        buffer = bytearray(pickle.dumps(message))
+        buffer.insert(0, 2)
+        udp_server_socket.sendto(buffer, server_address)  # Send the message to the specified address
         print(f"Sent :{message}")
         """
         if len(message)>0:
