@@ -21,6 +21,9 @@ def main():
         if not success:
             print("Ignoring empty camera frame.")
             continue
+
+        image_bgr = cv2.flip(image_bgr, 1) # Flip the camera if needed
+
         # Turn BGR image to RGB image
         image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
         hand_result = br.hands.process(image_rgb)
@@ -34,9 +37,13 @@ def main():
         # Recommended buffer size is 3584 bytes (3584 = 2^11 * 2^10 * 2^9)
         # Landmarks of 1 hand ~1700 bytes
         # Landmarks of 2 hands ~3400 bytes
-        message = str(br.get_hand_landmarks(hand_result))
-        udp_server_socket.sendto(message.encode(), server_address)  # Send the message to the specified address
- 
+        message = br.get_hand_landmarks(hand_result)
+
+        # Add pose data to display location of hands instead of just the position of hands
+        if br.get_pose_landmarks(pose_result): message.append([br.get_pose_landmarks(pose_result)[15], br.get_pose_landmarks(pose_result)[16]])
+        else:                                  message.append([(2.0, 15.0, -0.5, 0.0, 0.0),(2.0, 16.0, 0.5, 0.0, 0.0)])
+        udp_server_socket.sendto(str(message).encode(), server_address)  # Send the message to the specified address
+        print(f"Sent :{message}")
         """
         if len(message)>0:
             #message.insert(0, bytes(message_id[0])) # Changes the first byte of the list with the message_id as an identifier
@@ -62,7 +69,6 @@ def main():
             #print(len(buff))
             #print(buff)
         """
-        print(hand_result.multi_handedness)
 
         # Break loop on 'esc' key press
         if cv2.waitKey(1) & 0xFF == 27:
