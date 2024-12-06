@@ -2,7 +2,6 @@
 import socket
 import body_recognition as br
 import cv2
-import pickle
 from struct import pack
 cap = cv2.VideoCapture(0)
 
@@ -10,7 +9,7 @@ cap = cv2.VideoCapture(0)
 simulation_address = socket.gethostbyname(socket.getfqdn()) #socket.gethostbyname(socket.getfqdn())
 simulation_port = 8000
 server_address = (simulation_address, simulation_port)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
-message_id = 1 # the message identifier used for differentiating data sent to "UDP Reciever Server.py"
+message_id = 2 # the message identifier used for differentiating data sent to "UDP Reciever Server.py"
 
 
 def main():
@@ -44,10 +43,27 @@ def main():
         if br.get_pose_landmarks(pose_result): message.append([br.get_pose_landmarks(pose_result)[15], br.get_pose_landmarks(pose_result)[16]])
         else:                                  message.append([(2.0, 15.0, -0.5, 0.0, 0.0),(2.0, 16.0, 0.5, 0.0, 0.0)])
         
-        buffer = bytearray(pickle.dumps(message))
-        buffer.insert(0, 2)
-        udp_server_socket.sendto(buffer, server_address)  # Send the message to the specified address
+        message_to_send = []
+
+        print(message)
+
+        # Convert the message into a single dimentional list to send over UDP by packing
+        for items in message:
+            for values in items:
+                for data in values:
+                    message_to_send.append(data)
+
+        
+        buffer = pack(f'{len(message_to_send)}f', *message_to_send) 
+        
+        # Turn the buffer into byte array to add identification byte to the beginnig
+        byte_buffer = bytearray(buffer)
+        byte_buffer.insert(0, message_id)
+
+        udp_server_socket.sendto(byte_buffer, server_address)  # Send the message to the specified address
         print(f"Sent :{message}")
+        
+
         """
         if len(message)>0:
             #message.insert(0, bytes(message_id[0])) # Changes the first byte of the list with the message_id as an identifier

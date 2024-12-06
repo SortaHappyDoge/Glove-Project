@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading;
 using System.Net.Sockets;
 using UnityEngine;
+//using System.Diagnostics;
 public class SocketRecieverNEW : MonoBehaviour
 {
     Socket server;
@@ -39,33 +40,25 @@ public class SocketRecieverNEW : MonoBehaviour
 
         while(true){
             //data = null;
-            var bytes = new byte[10240];
+            var bytes = new byte[1024];
             int bytesReceived = server.Receive(bytes);
             //data += Encoding.ASCII.GetString(bytes, 0, bytesReceived);
 
-            byte[] dataByte = new byte[bytesReceived - 1];
+            byte[] dataBytes = new byte[bytesReceived - 1];
             
-            Array.Copy(bytes, 1, dataByte, 0, bytesReceived-1);
+            Array.Copy(bytes, 1, dataBytes, 0, bytesReceived - 1);
 
             if(bytes[0] == 1){
-                var data = new float[dataByte.Length / sizeof(float)];
-                Buffer.BlockCopy(dataByte, 0, data, 0, dataByte.Length);  
+                var data = new float[dataBytes.Length / sizeof(float)];
+                Buffer.BlockCopy(dataBytes, 0, data, 0, dataBytes.Length);  
 
                 /* Demo to see the output values */
-                demoRotation = new Vector3(data[3], 0, data[4])/PI*180;
-                /*                               */  
+                demoRotation = new Vector3(data[3], 0, data[4]) / PI*180;  
             }
-            if(bytes[0] == 2){
-                /*switch (dataByte.Length)
-                {
-                    case 176: //44 floats
 
-                    case 92:
-                    default:
-                        break;
-                }*/
-                var data = new float[dataByte.Length/sizeof(float)];
-                Buffer.BlockCopy(dataByte, 0, data, 0, dataByte.Length);
+            if(bytes[0] == 2){
+                float[] data = new float[dataBytes.Length / sizeof(float)];
+                Buffer.BlockCopy(dataBytes, 0, data, 0, dataBytes.Length);
 
                 /*  Attempt at turning float into landmarks :pray:
                 List<> landmarks = new();
@@ -81,31 +74,34 @@ public class SocketRecieverNEW : MonoBehaviour
                         landmark = new();
                     }
                 }
-                */
 
-
-                /*foreach(float value in data){
+                foreach(float value in data){
                     Debug.Log(value);
                 }*/
             }
 
             Debug.Log(bytes[0]);
 
-            /*foreach(var b in bytes){
+            /*
+            foreach(var b in bytes){
                 Debug.Log(b);
             }
+
             foreach(var b in dataByte){
                 Debug.Log(b);
-            }*/
-            /*foreach(float f in data){
+            }
+
+            foreach(float f in data){
                 Debug.Log(f);
-            }*/
+            }
+            */
             Thread.Sleep(1);
         }
     }
     
     void Update(){
-        demoCube.transform.eulerAngles = demoRotation; 
+        
+        //demoCube.transform.eulerAngles = demoRotation; 
     }
     
 
