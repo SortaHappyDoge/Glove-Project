@@ -35,6 +35,7 @@ public class SocketRecieverNEW : MonoBehaviour
         // Clean up on application quit
         if (SocketThread != null && SocketThread.IsAlive) 
             SocketThread.Abort();
+            server.Close();
     }
     void OnDisable()
     {
@@ -42,6 +43,7 @@ public class SocketRecieverNEW : MonoBehaviour
         if (SocketThread != null && SocketThread.IsAlive)
         {
             SocketThread.Abort();
+            server.Close();
         }
     }
 

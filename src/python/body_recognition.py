@@ -59,7 +59,8 @@ def get_hand_landmarks(hand_results):
     if hand_results.multi_hand_landmarks and hand_results.multi_handedness:
         for handedness, hand_landmarks in zip(hand_results.multi_handedness, hand_results.multi_hand_world_landmarks):
             if handedness.classification[0].label == "Left": hand_no = 1
-            if handedness.classification[0].label == "Right": hand_no = 0
+            else: hand_no = 0
+            #if handedness.classification[0].label == "Right": hand_no = 0
             for id, landmark in enumerate(hand_landmarks.landmark):
                 if hand_no == 1 or hand_no == 0:
                     landmarks.append((float(hand_no), float(id), landmark.x, landmark.y, landmark.z))
