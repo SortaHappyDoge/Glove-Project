@@ -7,11 +7,11 @@ from struct import pack
 cap = cv2.VideoCapture(0)
 
 
-simulation_address = socket.gethostbyname(socket.getfqdn()) #socket.gethostbyname(socket.getfqdn())
+simulation_address = socket.gethostbyname(socket.getfqdn())
 simulation_port = 8000
 server_address = (simulation_address, simulation_port)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
 message_id = 2 # the message identifier used for differentiating data sent to "UDP Reciever Server.py"
-
+print(simulation_address)
 
 def main():
     # Create a UDP socket
@@ -36,8 +36,7 @@ def main():
 
         # Sends any detected hand's landmarks with the format: [[(hand_id, landmark_id, x, y, z), ...],[...]]
         # Recommended buffer size is 3584 bytes (3584 = 2^11 * 2^10 * 2^9)
-        # Landmarks of 1 hand ~1700 bytes
-        # Landmarks of 2 hands ~3400 bytes
+        
         message = br.get_hand_landmarks(hand_result)
 
         # Add pose data to display location of hands instead of just the position of hands
@@ -54,7 +53,6 @@ def main():
         for landmark in message:
             for value in landmark:
                 message_to_send.append(value)
-
         
         buffer = pack(f'{len(message_to_send)}f', *message_to_send) 
         
@@ -63,34 +61,7 @@ def main():
         byte_buffer.insert(0, message_id)
 
         udp_server_socket.sendto(byte_buffer, server_address)  # Send the message to the specified address
-        print(f"Sent :{message}")
-        
-
-        """
-        if len(message)>0:
-            #message.insert(0, bytes(message_id[0])) # Changes the first byte of the list with the message_id as an identifier
-            
-            
-            buff = bytearray([])
-            buff.extend((message_id).to_bytes())
-            
-            if len(message) == 1:
-                landmarks = message[0]                  # !!! The variable -message- is string this just takes a single character
-                for i in landmarks:
-                    buff.extend(pack("2i3f", *i))
-                    
-            elif len(message) == 2:
-                landmarks = message[0] + message[1]     # !!! The variable -message- is string this just takes a single character
-                for i in landmarks:
-                    buff.extend(pack("2i3f", *i))
-                    
-            else:
-                print("message size error")
-                return
-            
-            #print(len(buff))
-            #print(buff)
-        """
+        #print(f"Sent :{message}")
 
         # Break loop on 'esc' key press
         if cv2.waitKey(1) & 0xFF == 27:
