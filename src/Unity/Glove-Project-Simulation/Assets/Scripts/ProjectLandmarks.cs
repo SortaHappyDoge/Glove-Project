@@ -57,15 +57,15 @@ public class ProjectLandmarks : MonoBehaviour
             handPositions = landmarks.GetRange(landmarks.Count-2, 2);
             //Debug.Log($"pos {handPositions.Count}, {handLandmarks.Count} marks");
             AssignVectors(1000);
-            foreach(float[] landmark in handLandmarks){
-                //Debug.Log($"no {landmark[0]}, id {landmark[1]}, x {landmark[2]}, y {landmark[3]}, z {landmark[4]}");
-            }
-            /*
+            /*foreach(float[] landmark in handLandmarks){
+                Debug.Log($"no {landmark[0]}, id {landmark[1]}, x {landmark[2]}, y {landmark[3]}, z {landmark[4]}");
+            }*/
+            
             if (isDrawLines)
             {
                 UpdateLines();
                 RemoveInvalidLines();
-            }*/
+            }
             socketReciever.isReceivedMessage = false;
         }
     }
@@ -76,7 +76,7 @@ public class ProjectLandmarks : MonoBehaviour
         int counter = 0;
         List<float[]> landmarks = new();
         float[] landmark = null; 
-        Debug.Log(message.Length);
+        //Debug.Log(message.Length);
         foreach (float value in message)
         {
             if (counter == 0) {landmark = new float[5];}
@@ -120,9 +120,8 @@ public class ProjectLandmarks : MonoBehaviour
                     objects[i].transform.position = (new Vector3(handLandmarks[i][2], -handLandmarks[i][3], handLandmarks[i][4]) * coordinateScale) + right;
             }
         }
-
     }
-    /*
+    
     // Draws lines between landmarks to distinguish them
     private void UpdateLines()
     {
@@ -134,8 +133,8 @@ public class ProjectLandmarks : MonoBehaviour
             // Ensure both indexes are within the bounds of the objects list
             if (indexA < handLandmarks.Count && indexB < handLandmarks.Count)
             {
-                GameObject objA = handLandmarks[indexA].landmarkObject;
-                GameObject objB = handLandmarks[indexB].landmarkObject;
+                GameObject objA = objects[indexA];
+                GameObject objB = objects[indexB];
 
                 if (objA != null && objB != null)
                 {
@@ -166,7 +165,7 @@ public class ProjectLandmarks : MonoBehaviour
 
             // Check if objects are null or indexes are out of bound
             if (indexA >= handLandmarks.Count || indexB >= handLandmarks.Count ||
-                handLandmarks[indexA].landmarkObject == null || handLandmarks[indexB].landmarkObject == null)
+                objects[indexA] == null || objects[indexB] == null)
             {
                 Destroy(pair.Value.gameObject);  // Destroy LineRenderer
                 keysToRemove.Add(pair.Key);
@@ -191,5 +190,5 @@ public class ProjectLandmarks : MonoBehaviour
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
 
         return lineRenderer;
-    }*/
+    }
 }
