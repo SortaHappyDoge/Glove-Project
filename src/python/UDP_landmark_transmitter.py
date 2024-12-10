@@ -7,7 +7,7 @@ from struct import pack
 cap = cv2.VideoCapture(0)
 
 
-simulation_address = "192.168.62.24" #socket.gethostbyname(socket.getfqdn())
+simulation_address = socket.gethostbyname(socket.getfqdn())
 simulation_port = 8000
 server_address = (simulation_address, simulation_port)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
 message_id = 2 # the message identifier used for differentiating data sent to "UDP Reciever Server.py"
@@ -23,8 +23,6 @@ def main():
             print("Ignoring empty camera frame.")
             continue
 
-        height, width, channels = image_bgr.shape
-
         image_bgr = cv2.flip(image_bgr, 1) # Flip the camera if needed
 
         # Turn BGR image to RGB image
@@ -37,15 +35,15 @@ def main():
         cv2.imshow('MediaPipe Detection Results', image_bgr)
 
         # Sends any detected hand's landmarks with the format: [[(hand_id, landmark_id, x, y, z), ...],[...]]
-        # Recommended buffer size is 3584 bytes (3584 = 2^11 * 2^10 * 2^9)
+        # Recommended buffer size is 1024. Max amount allowed to be sent is 881
         
         message = br.get_hand_landmarks(hand_result)
 
-        hands_wrist = br.get_wrist_landmarks(hand_result) #, width, height
+        hands_locations = br.get_location_landmarks(hand_result)
         # Add pose data to display location of hands instead of just the position of hands
-        if hands_wrist: 
-            message.append(hands_wrist[0])
-            message.append(hands_wrist[1])
+        if hands_locations: 
+            message.append(hands_locations[0])
+            message.append(hands_locations[1])
         else:                                  
             message.append((2.0, 15.0, -0.5, 0.0, 0.0))
             message.append((2.0, 16.0, 0.5, 0.0, 0.0))

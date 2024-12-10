@@ -102,9 +102,9 @@ public class ProjectLandmarks : MonoBehaviour
         for (int i = 0; i < handLandmarks.Count; i++)
         {
             if (handLandmarks[i][0] == 0)
-                objects[(int)handLandmarks[i][1]].transform.position = (new Vector3(handLandmarks[i][2], -handLandmarks[i][3], handLandmarks[i][4]) * coordinateScale) + left;
+                objects[(int)handLandmarks[i][1]].transform.localPosition = new Vector3(handLandmarks[i][2], -handLandmarks[i][3], handLandmarks[i][4]) * coordinateScale; // + left
             if (handLandmarks[i][0] == 1)
-                objects[(int)handLandmarks[i][1]].transform.position = (new Vector3(handLandmarks[i][2], -handLandmarks[i][3], handLandmarks[i][4]) * coordinateScale) + right;
+                objects[(int)handLandmarks[i][1]].transform.localPosition = new Vector3(handLandmarks[i][2], -handLandmarks[i][3], handLandmarks[i][4]) * coordinateScale; // + right
         }
         /*
         // Assign coordinates to objects
@@ -139,7 +139,7 @@ public class ProjectLandmarks : MonoBehaviour
             int indexB = pair.Item2;
 
             // Ensure both indexes are within the bounds of the objects list
-            if (indexA < handLandmarks.Count && indexB < handLandmarks.Count)
+            if (indexA < objects.Count && indexB < objects.Count)
             {
                 GameObject objA = objects[indexA];
                 GameObject objB = objects[indexB];
@@ -172,7 +172,7 @@ public class ProjectLandmarks : MonoBehaviour
             int indexB = pair.Key.Item2;
 
             // Check if objects are null or indexes are out of bound
-            if (indexA >= handLandmarks.Count || indexB >= handLandmarks.Count ||
+            if (indexA >= objects.Count || indexB >= objects.Count ||
                 objects[indexA] == null || objects[indexB] == null)
             {
                 Destroy(pair.Value.gameObject);  // Destroy LineRenderer

@@ -53,7 +53,8 @@ def print_pose_landmarks(pose_results):
             print("pose", id, landmark.x, landmark.y, landmark.z)
 
 # Temporary function for getting wrist coords of multi_hand_landmarks
-"""def get_wrist_landmarks(hand_results):
+"""
+def get_wrist_landmarks(hand_results):
     left_wrist, right_wrist = None, None
     if hand_results.multi_hand_landmarks and hand_results.multi_handedness:
         for handedness, hand_landmarks in zip(hand_results.multi_handedness, hand_results.multi_hand_landmarks):
@@ -70,10 +71,49 @@ def print_pose_landmarks(pose_results):
             if right_wrist == None:
                 return left_wrist
             return left_wrist, right_wrist
-    return None, None"""
+    return None, None
+"""
 
-def get_wrist_landmarks(hand_results, screen_x = 1, screen_y = 1):
-    wrist_landmarks = []
+"""
+def get_location_landmarks(hand_results):
+    location_landmarks = []
+    if hand_results.multi_hand_landmarks and hand_results.multi_handedness:
+        # Set default wrist coordinates (0, 0, 0) in case hand is not detected
+        left_hand_detected = False
+        right_hand_detected = False
+        landmarks_to_get = (0, 5, 9, 13, 17)
+        x_sum, y_sum, z_sum = 0.0, 0.0, 0.0
+        
+        for handedness, hand_landmarks in zip(hand_results.multi_handedness, hand_results.multi_hand_landmarks):
+            # Get the specified landmarks
+            for id in landmarks_to_get:
+                landmark = hand_landmarks.landmark[id]
+            
+                # Check if the hand is left or right and process the landmark
+                if handedness.classification[0].label == "Left":
+                    left_hand_detected = True             
+                    hand_no = 0
+                elif handedness.classification[0].label == "Right":
+                    right_hand_detected = True
+                    hand_no = 1
+                x_sum = landmark.x + x_sum
+                y_sum = landmark.y + x_sum
+                z_sum = landmark.z + x_sum
+            
+            location_landmarks.append((float(hand_no), 0.0, x_sum/5, y_sum/5, z_sum/5))
+
+        # If the left hand wasn't detected, add the default coordinates (0, 0, 0)
+        if not left_hand_detected:
+            location_landmarks.append((0.0, 0.0, 0.0, 0.0, 0.0))
+
+        # If the right hand wasn't detected, add the default coordinates (0, 0, 0)
+        if not right_hand_detected:
+            location_landmarks.append((1.0, 0.0, 0.0, 0.0, 0.0))
+    return location_landmarks
+"""
+
+def get_location_landmarks(hand_results):
+    wrist_landmarks = [(0.0, 9.0, 0.0, 0.0, 0.0), (1.0, 9.0, 0.0, 0.0, 0.0)]
     
     if hand_results.multi_hand_landmarks and hand_results.multi_handedness:
         # Set default wrist coordinates (0, 0, 0) in case hand is not detected
@@ -82,24 +122,24 @@ def get_wrist_landmarks(hand_results, screen_x = 1, screen_y = 1):
         
         for handedness, hand_landmarks in zip(hand_results.multi_handedness, hand_results.multi_hand_landmarks):
             # Get the wrist landmark (index 0)
-            wrist = hand_landmarks.landmark[0]
+            wrist = hand_landmarks.landmark[9]
             
             # Check if the hand is left or right and process the wrist landmark
             if handedness.classification[0].label == "Left":
                 left_wrist_detected = True
-                wrist_landmarks.append((1, 0, wrist.x * screen_x, wrist.y * screen_y, wrist.z))  # Left hand wrist
+                wrist_landmarks[1] = (1.0, 9.0, wrist.x, wrist.y, wrist.z)
+
             elif handedness.classification[0].label == "Right":
                 right_wrist_detected = True
-                wrist_landmarks.append((0, 0, wrist.x * screen_x, wrist.y * screen_y, wrist.z))  # Right hand wrist
+                wrist_landmarks[0] = (0.0, 9.0, wrist.x, wrist.y, wrist.z)
         
         # If the left wrist wasn't detected, add the default coordinates (0, 0, 0)
         if not left_wrist_detected:
-            wrist_landmarks.append((0, 0, 0.0, 0.0, 0.0))  # Left wrist with default (0, 0, 0)
+            wrist_landmarks[1] = (1.0, 9.0, 0.0, 0.0, 0.0)
 
         # If the right wrist wasn't detected, add the default coordinates (0, 0, 0)
         if not right_wrist_detected:
-            wrist_landmarks.append((1, 0, 0.0, 0.0, 0.0))  # Right wrist with default (0, 0, 0)
-
+            wrist_landmarks[0] = (0.0, 9.0, 0.0, 0.0, 0.0)
     return wrist_landmarks
 
 
