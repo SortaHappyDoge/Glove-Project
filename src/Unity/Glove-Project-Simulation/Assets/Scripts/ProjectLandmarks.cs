@@ -56,7 +56,7 @@ public class ProjectLandmarks : MonoBehaviour
             handLandmarks = landmarks.GetRange(0, landmarks.Count-2);
             handPositions = landmarks.GetRange(landmarks.Count-2, 2);
             //Debug.Log($"pos {handPositions.Count}, {handLandmarks.Count} marks");
-            AssignVectors(1000);
+            AssignVectors(1);
             /*foreach(float[] landmark in handLandmarks){
                 Debug.Log($"no {landmark[0]}, id {landmark[1]}, x {landmark[2]}, y {landmark[3]}, z {landmark[4]}");
             }*/
@@ -99,6 +99,14 @@ public class ProjectLandmarks : MonoBehaviour
         leftHand.transform.position = left;
         rightHand.transform.position = right;
 
+        for (int i = 0; i < handLandmarks.Count; i++)
+        {
+            if (handLandmarks[i][0] == 0)
+                objects[(int)handLandmarks[i][1]].transform.position = (new Vector3(handLandmarks[i][2], -handLandmarks[i][3], handLandmarks[i][4]) * coordinateScale) + left;
+            if (handLandmarks[i][0] == 1)
+                objects[(int)handLandmarks[i][1]].transform.position = (new Vector3(handLandmarks[i][2], -handLandmarks[i][3], handLandmarks[i][4]) * coordinateScale) + right;
+        }
+        /*
         // Assign coordinates to objects
         if (handLandmarks.Count == 21)
         {
@@ -119,7 +127,7 @@ public class ProjectLandmarks : MonoBehaviour
                 if (handLandmarks[i][0] == 1)
                     objects[i].transform.position = (new Vector3(handLandmarks[i][2], -handLandmarks[i][3], handLandmarks[i][4]) * coordinateScale) + right;
             }
-        }
+        }*/
     }
     
     // Draws lines between landmarks to distinguish them
@@ -185,8 +193,8 @@ public class ProjectLandmarks : MonoBehaviour
         LineRenderer lineRenderer = lineObj.AddComponent<LineRenderer>();
 
         // Customize the line appearance here
-        lineRenderer.startWidth = 2f;
-        lineRenderer.endWidth = 2f;
+        lineRenderer.startWidth = 0.002f;
+        lineRenderer.endWidth = 0.002f;
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
 
         return lineRenderer;

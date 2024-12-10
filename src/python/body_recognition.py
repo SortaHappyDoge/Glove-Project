@@ -52,7 +52,57 @@ def print_pose_landmarks(pose_results):
         for id, landmark in enumerate(pose_results.pose_landmarks.landmark):
             print("pose", id, landmark.x, landmark.y, landmark.z)
 
- 
+# Temporary function for getting wrist coords of multi_hand_landmarks
+"""def get_wrist_landmarks(hand_results):
+    left_wrist, right_wrist = None, None
+    if hand_results.multi_hand_landmarks and hand_results.multi_handedness:
+        for handedness, hand_landmarks in zip(hand_results.multi_handedness, hand_results.multi_hand_landmarks):
+            if handedness.classification[0].label == "Left":
+                left_list = hand_landmarks.landmark[0]
+                left_wrist = (2.0, float(0), left_list.x, left_list.y, left_list.z)
+
+            if handedness.classification[0].label == "Right":
+                right_list = hand_landmarks.landmark[0]
+                right_wrist = (2.0, float(0), right_list.x, right_list.y, right_list.z)
+
+            if left_wrist == None:
+                return right_list
+            if right_wrist == None:
+                return left_wrist
+            return left_wrist, right_wrist
+    return None, None"""
+
+def get_wrist_landmarks(hand_results, screen_x = 1, screen_y = 1):
+    wrist_landmarks = []
+    
+    if hand_results.multi_hand_landmarks and hand_results.multi_handedness:
+        # Set default wrist coordinates (0, 0, 0) in case hand is not detected
+        left_wrist_detected = False
+        right_wrist_detected = False
+        
+        for handedness, hand_landmarks in zip(hand_results.multi_handedness, hand_results.multi_hand_landmarks):
+            # Get the wrist landmark (index 0)
+            wrist = hand_landmarks.landmark[0]
+            
+            # Check if the hand is left or right and process the wrist landmark
+            if handedness.classification[0].label == "Left":
+                left_wrist_detected = True
+                wrist_landmarks.append((1, 0, wrist.x * screen_x, wrist.y * screen_y, wrist.z))  # Left hand wrist
+            elif handedness.classification[0].label == "Right":
+                right_wrist_detected = True
+                wrist_landmarks.append((0, 0, wrist.x * screen_x, wrist.y * screen_y, wrist.z))  # Right hand wrist
+        
+        # If the left wrist wasn't detected, add the default coordinates (0, 0, 0)
+        if not left_wrist_detected:
+            wrist_landmarks.append((0, 0, 0.0, 0.0, 0.0))  # Left wrist with default (0, 0, 0)
+
+        # If the right wrist wasn't detected, add the default coordinates (0, 0, 0)
+        if not right_wrist_detected:
+            wrist_landmarks.append((1, 0, 0.0, 0.0, 0.0))  # Right wrist with default (0, 0, 0)
+
+    return wrist_landmarks
+
+
 # Return pose and hand landmarks x,y,z coordinates with id as float
 def get_hand_landmarks(hand_results):
     landmarks = []
@@ -63,7 +113,7 @@ def get_hand_landmarks(hand_results):
             #if handedness.classification[0].label == "Right": hand_no = 0
             for id, landmark in enumerate(hand_landmarks.landmark):
                 if hand_no == 1 or hand_no == 0:
-                    landmarks.append((float(hand_no), float(id), landmark.x, landmark.y, landmark.z))
+                    landmarks.append((float(hand_no), float(id + (hand_no * 21)), landmark.x, landmark.y, landmark.z))
     return landmarks
 def get_pose_landmarks(pose_results):
     landmarks = []

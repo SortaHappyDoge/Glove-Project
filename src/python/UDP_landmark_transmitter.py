@@ -7,7 +7,7 @@ from struct import pack
 cap = cv2.VideoCapture(0)
 
 
-simulation_address = socket.gethostbyname(socket.getfqdn())
+simulation_address = "192.168.62.24" #socket.gethostbyname(socket.getfqdn())
 simulation_port = 8000
 server_address = (simulation_address, simulation_port)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
 message_id = 2 # the message identifier used for differentiating data sent to "UDP Reciever Server.py"
@@ -23,15 +23,17 @@ def main():
             print("Ignoring empty camera frame.")
             continue
 
+        height, width, channels = image_bgr.shape
+
         image_bgr = cv2.flip(image_bgr, 1) # Flip the camera if needed
 
         # Turn BGR image to RGB image
         image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
         hand_result = br.hands.process(image_rgb)
-        pose_result = br.pose.process(image_rgb)
+        #pose_result = br.pose.process(image_rgb)
         # Draw and Display the frame with pose and hand landmarks
         br.draw_hands(image_bgr, hand_result)
-        br.draw_pose(image_bgr, pose_result)
+        #br.draw_pose(image_bgr, pose_result)
         cv2.imshow('MediaPipe Detection Results', image_bgr)
 
         # Sends any detected hand's landmarks with the format: [[(hand_id, landmark_id, x, y, z), ...],[...]]
@@ -39,10 +41,11 @@ def main():
         
         message = br.get_hand_landmarks(hand_result)
 
+        hands_wrist = br.get_wrist_landmarks(hand_result) #, width, height
         # Add pose data to display location of hands instead of just the position of hands
-        if br.get_pose_landmarks(pose_result): 
-            message.append(br.get_pose_landmarks(pose_result)[15])
-            message.append(br.get_pose_landmarks(pose_result)[16])
+        if hands_wrist: 
+            message.append(hands_wrist[0])
+            message.append(hands_wrist[1])
         else:                                  
             message.append((2.0, 15.0, -0.5, 0.0, 0.0))
             message.append((2.0, 16.0, 0.5, 0.0, 0.0))
@@ -59,8 +62,9 @@ def main():
         # Turn the buffer into byte array to add identification byte to the beginnig
         byte_buffer = bytearray(buffer)
         byte_buffer.insert(0, message_id)
-
-        udp_server_socket.sendto(byte_buffer, server_address)  # Send the message to the specified address
+        if len(byte_buffer) <= 881:
+            udp_server_socket.sendto(byte_buffer, server_address)  # Send the message to the specified address
+        else: print("Didnt send message: Message size was too big")
         #print(f"Sent :{message}")
 
         # Break loop on 'esc' key press
