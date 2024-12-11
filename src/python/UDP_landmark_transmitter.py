@@ -7,7 +7,7 @@ from struct import pack
 cap = cv2.VideoCapture(0)
 
 
-simulation_address = socket.gethostbyname(socket.getfqdn())
+simulation_address = "192.168.62.24" #socket.gethostbyname(socket.getfqdn())
 simulation_port = 8000
 server_address = (simulation_address, simulation_port)  # 'localhost' is the IP for local testing, and port 6789 is chosen arbitrarily
 message_id = 2 # the message identifier used for differentiating data sent to "UDP Reciever Server.py"
