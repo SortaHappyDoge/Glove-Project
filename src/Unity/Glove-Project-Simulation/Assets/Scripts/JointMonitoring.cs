@@ -9,7 +9,7 @@ public class JointMonitoring : MonoBehaviour
 
 
     void Update(){
-        FetchAngles(0);
+        //FetchAngles(0);
     }
 
     void FetchAngles(int options){

@@ -94,20 +94,17 @@ public class ProjectLandmarks : MonoBehaviour
     // Takes an integer to scale the size of the coordinates
     public void AssignVectors(int coordinateScale)
     {
-        Vector3 left = new Vector3(handPositions[0][2], -handPositions[0][3], handPositions[0][4] * 10f) * coordinateScale;
-        Vector3 right = new Vector3(handPositions[1][2], -handPositions[1][3], handPositions[1][4] * 10f) * coordinateScale;
-        leftHand.transform.position = left;
-        rightHand.transform.position = right;
+        Vector3 left = new Vector3(handPositions[0][2], -handPositions[0][3], handPositions[0][4] * 7f) * coordinateScale;
+        Vector3 right = new Vector3(handPositions[1][2], -handPositions[1][3], handPositions[1][4] * 7f) * coordinateScale;
+        leftHand.transform.position = right;
+        rightHand.transform.position = left;
 
+        // Assign coordinates to objects
         for (int i = 0; i < handLandmarks.Count; i++)
         {
-            if (handLandmarks[i][0] == 0)
-                objects[(int)handLandmarks[i][1]].transform.localPosition = new Vector3(handLandmarks[i][2], -handLandmarks[i][3], handLandmarks[i][4]) * coordinateScale; // + left
-            if (handLandmarks[i][0] == 1)
-                objects[(int)handLandmarks[i][1]].transform.localPosition = new Vector3(handLandmarks[i][2], -handLandmarks[i][3], handLandmarks[i][4]) * coordinateScale; // + right
+            objects[(int)handLandmarks[i][1]].transform.localPosition = new Vector3(handLandmarks[i][2], -handLandmarks[i][3], handLandmarks[i][4]) * coordinateScale; // + left
         }
         /*
-        // Assign coordinates to objects
         if (handLandmarks.Count == 21)
         {
             for (int i = 0; i < handLandmarks.Count; i++)
