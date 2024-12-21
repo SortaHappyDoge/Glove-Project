@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7771510947219287653}
   - component: {fileID: 8073028540760648578}
   - component: {fileID: 5007204584244565830}
+  - component: {fileID: 5366023959595352606}
   m_Layer: 0
   m_Name: LandmarkSphere
   m_TagString: Untagged
@@ -99,9 +100,25 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 8
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5366023959595352606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4516597874745992418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ae9e4cbf4ba327118bfb0a2be674f8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
+  hand: 0
+  LeftStates: 000000000000000000000000000000000000000000
+  RightStates: 000000000000000000000000000000000000000000
