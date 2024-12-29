@@ -124,7 +124,7 @@ void send_data_to_server(char *ip, byte message[], int length, uint8_t message_t
     }
 
     UDP_client.beginPacket(ip, server_port);
-    UDP_client.print(message_type);
+    UDP_client.write(message_type);
     UDP_client.write(message, length);
     UDP_client.endPacket();
 }
@@ -186,20 +186,20 @@ void setup(){
     devStatus = mpu.dmpInitialize();
 
     /* Supply your gyro offsets here, scaled for min sensitivity */
-    mpu.setXGyroOffset(0);
-    mpu.setYGyroOffset(0);
-    mpu.setZGyroOffset(0);
-    mpu.setXAccelOffset(0);
-    mpu.setYAccelOffset(0);
-    mpu.setZAccelOffset(0);
+    mpu.setXGyroOffset(217);
+    mpu.setYGyroOffset(30);
+    mpu.setZGyroOffset(-12);
+    mpu.setXAccelOffset(-1996);
+    mpu.setYAccelOffset(-1666);
+    mpu.setZAccelOffset(2348);
 
     /* Making sure it worked (returns 0 if so) */
     if (devStatus == 0)
     {
-        mpu.CalibrateAccel(6); // Calibration Time: generate offsets and calibrate our MPU6050
+        /*mpu.CalibrateAccel(6); // Calibration Time: generate offsets and calibrate our MPU6050
         mpu.CalibrateGyro(6);
         Serial.println("These are the Active offsets: ");
-        mpu.PrintActiveOffsets();
+        mpu.PrintActiveOffsets();*/
         Serial.println(F("Enabling DMP...")); // Turning ON DMP
         mpu.setDMPEnabled(true);
 
@@ -223,6 +223,5 @@ void loop(){
     byte buffer[sizeof(message_data)];
     memcpy(buffer, message_data, sizeof(message_data));
     send_data_to_server(connection_ip, buffer, sizeof(buffer), 0x00);
-    Serial.println(message_data[3]);
     delay(10);
 }

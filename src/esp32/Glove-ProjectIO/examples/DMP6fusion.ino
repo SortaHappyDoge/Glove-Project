@@ -135,7 +135,7 @@ void setup() {
   mpu.setXAccelOffset(0);
   mpu.setYAccelOffset(0);
   mpu.setZAccelOffset(0);
-
+  
   /* Making sure it worked (returns 0 if so) */ 
   if (devStatus == 0) {
     mpu.CalibrateAccel(6);  // Calibration Time: generate offsets and calibrate our MPU6050
