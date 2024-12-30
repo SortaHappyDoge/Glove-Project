@@ -1,4 +1,4 @@
-using System.Collections;
+    using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.SearchService;
 using UnityEngine;
@@ -13,7 +13,7 @@ public class CheckTouchState : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -22,8 +22,9 @@ public class CheckTouchState : MonoBehaviour
 
     }
 
-    private void OnTriggerEnter(Collider collision){
-        if (collision.transform.GetComponent<CheckTouchState>())
+    void OnTriggerEnter(Collider collision){
+        collision.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
+        if (collision.transform.GetComponent<CheckTouchState>() != null)
         {
             switch (collision.transform.GetComponent<CheckTouchState>().hand)
             {
@@ -38,8 +39,9 @@ public class CheckTouchState : MonoBehaviour
             }
         }
     }
-    private void OnTriggerExit(Collider collision){
-        if (collision.transform.GetComponent<CheckTouchState>())
+    void OnTriggerExit(Collider collision){
+        collision.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
+        if (collision.transform.GetComponent<CheckTouchState>() != null)
         {
             switch (collision.transform.GetComponent<CheckTouchState>().hand)
             {
