@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class JointMonitoring : MonoBehaviour
 {
@@ -9,7 +10,12 @@ public class JointMonitoring : MonoBehaviour
 
 
     void Update(){
-        FetchAngles(0);
+        if(!(SceneManager.GetActiveScene().name == "Glove Projection")){
+            FetchAngles(0);
+        }
+        else{
+            
+        }
     }
 
     void FetchAngles(int options){
@@ -32,4 +38,7 @@ public class JointMonitoring : MonoBehaviour
             }
         }
     }
+
+
+
 }

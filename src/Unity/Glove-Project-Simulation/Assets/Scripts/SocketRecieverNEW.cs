@@ -6,17 +6,16 @@ using System.Net.Sockets;
 using UnityEngine;
 using UnityEditor.VersionControl;
 using System.Net.WebSockets;
-//using System.Diagnostics;
 public class SocketRecieverNEW : MonoBehaviour
 {
-    //public Vector3 demoRotation;
-    //public GameObject demoCube;
-    //float PI = 3.14f;
     Socket server;
     Thread SocketThread;
     public int messageId;
     public float[] receivedData;
     public bool isReceivedMessage;  
+
+    public ProjectESP projectESP;
+
     void Start(){
         Application.runInBackground = true;
         InitiateSocket();
@@ -24,10 +23,10 @@ public class SocketRecieverNEW : MonoBehaviour
     }
 
     void Update(){
-        /*if (messageId == 1)
+        if (messageId == 0)
         {
-            demoCube.transform.eulerAngles = demoRotation;
-        }*/
+        
+        }
     }
 
     void OnApplicationQuit()
@@ -55,17 +54,18 @@ public class SocketRecieverNEW : MonoBehaviour
     }
 
     void SocketRun(){
+        Debug.Log("Thread Initiated...");
+
         server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         //var buffer = new MemoryStream();        
 
         IPAddress ip = getIPAddress();
         IPEndPoint localEndPoint = new IPEndPoint(ip, 8000);
         //IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 8000);
-        Debug.Log(ip);
-
 
         server.Bind(localEndPoint);
 
+        Debug.Log("Server Initiated, IP: " + ip);
         while(true){
 
             //data = null;
@@ -78,17 +78,16 @@ public class SocketRecieverNEW : MonoBehaviour
             Array.Copy(bytes, 1, dataBytes, 0, bytesReceived - 1);
 
             messageId = bytes[0];
-
-            if(bytes[0] == 1)
+            Debug.Log("Message Received" + " " + bytesReceived);
+            if(messageId == 0)
             {
                 var data = new float[dataBytes.Length / sizeof(float)];
-                Buffer.BlockCopy(dataBytes, 0, data, 0, dataBytes.Length);  
+                Buffer.BlockCopy(dataBytes, 0, data, 0, dataBytes.Length);
 
-                /* Demo to see the output values */
-                //demoRotation = new Vector3(data[3], 0, data[4]) / PI*180;  
+                projectESP.FetchData(data);
             }
 
-            if(bytes[0] == 2)
+            if(messageId == 2)
             {
                 var data = new float[dataBytes.Length / 4];
                 Buffer.BlockCopy(dataBytes, 0, data, 0, dataBytes.Length);

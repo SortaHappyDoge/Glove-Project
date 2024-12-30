@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class AngleCalculation : MonoBehaviour
 {
@@ -9,10 +10,17 @@ public class AngleCalculation : MonoBehaviour
 
     public string angleName;
 
-    public Vector3 angleDirection = Vector3.one;
+    Vector3 angleDirection = new Vector3(1, 1, 1);
     GameObject middle_point;
 
+
     void Start(){
+        if(SceneManager.GetActiveScene().name == "Glove Projection"){
+            point_0 = transform.parent.gameObject;
+            point_1 = transform.gameObject;
+            point_2 = transform.GetChild(0).gameObject;
+            angleName = transform.parent.name + " - " + transform.name + " - " + transform.GetChild(0).name;
+        }
         middle_point = point_1;
     }
 
