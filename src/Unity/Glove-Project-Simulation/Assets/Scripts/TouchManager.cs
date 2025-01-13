@@ -12,6 +12,28 @@ public class TouchManager : MonoBehaviour
         audioSources = soundPlayer.GetComponents<AudioSource>(); 
     }
 
+    void Command_0_4(){
+        audioSources[0].Play(0);
+    }
+    void Command_0_8(){
+        audioSources[0].Play(1);
+    }
+    void Command_0_12(){
+        audioSources[0].Play(2);
+    }
+    void Command_0_16(){
+        audioSources[0].Play(3);
+    }
+    void Command_0_20(){
+        audioSources[0].Play(4);
+    }
+    void Command_4_20(){
+        audioSources[0].Play(5);
+    }
+    void Command_4_16(){
+        audioSources[0].Play(6);
+    }
+    /*
     void Command_4_8(){
         audioSources[0].Play(0);
     }
@@ -36,8 +58,6 @@ public class TouchManager : MonoBehaviour
     void Command_4_19(){
         audioSources[7].Play(0);
     }
-
-
     void Command_22_29(){
         audioSources[8].Play(0);
     }
@@ -62,4 +82,5 @@ public class TouchManager : MonoBehaviour
     void Command_22_40(){
         audioSources[15].Play(0);
     }
+    */
 }

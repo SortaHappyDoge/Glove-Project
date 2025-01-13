@@ -78,7 +78,7 @@ public class SocketRecieverNEW : MonoBehaviour
             Array.Copy(bytes, 1, dataBytes, 0, bytesReceived - 1);
 
             messageId = bytes[0];
-            Debug.Log("Message Received" + " " + bytesReceived);
+            //Debug.Log("Message Received" + " " + bytesReceived);
             if(messageId == 0)
             {
                 var data = new float[dataBytes.Length / sizeof(float)];

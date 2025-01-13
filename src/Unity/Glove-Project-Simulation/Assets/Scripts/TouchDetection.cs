@@ -25,7 +25,7 @@ public class TouchDetection : MonoBehaviour
         TouchDetection other = collision.transform.GetComponent<TouchDetection>();
         jointContacts[other.joint_id] = true;
         collision.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
-
+        Debug.Log("Command"+"_"+joint_id+"_"+other.joint_id);
         touchManager.Invoke("Command"+"_"+joint_id+"_"+other.joint_id ,0f);
     }
     void OnTriggerExit(Collider collision){

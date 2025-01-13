@@ -14,6 +14,7 @@ using System.Security.Cryptography.X509Certificates;
 
 public class ProjectLandmarks : MonoBehaviour
 {
+    public bool isUpdateLocation = false;
     public bool isDrawLines = true;
     public SocketRecieverNEW socketReciever;
     public GameObject leftHand;
@@ -60,14 +61,13 @@ public class ProjectLandmarks : MonoBehaviour
             /*foreach(float[] landmark in handLandmarks){
                 Debug.Log($"no {landmark[0]}, id {landmark[1]}, x {landmark[2]}, y {landmark[3]}, z {landmark[4]}");
             }*/
-            
-            if (isDrawLines)
+            socketReciever.isReceivedMessage = false;
+        }
+        if (isDrawLines)
             {
                 UpdateLines();
                 RemoveInvalidLines();
             }
-            socketReciever.isReceivedMessage = false;
-        }
     }
 
     // Format the received landmark message into list of float arrays
@@ -96,9 +96,12 @@ public class ProjectLandmarks : MonoBehaviour
     {
         Vector3 left = new Vector3(handPositions[0][2], -handPositions[0][3], handPositions[0][4] * 10f) * coordinateScale;
         Vector3 right = new Vector3(handPositions[1][2], -handPositions[1][3], handPositions[1][4] * 10f) * coordinateScale;
-        leftHand.transform.position = left;
-        rightHand.transform.position = right;
-
+        if (isUpdateLocation)
+        {
+            leftHand.transform.position = left;
+            rightHand.transform.position = right;
+        }
+        
         for (int i = 0; i < handLandmarks.Count; i++)
         {
             if (handLandmarks[i][0] == 0)
